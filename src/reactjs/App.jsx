@@ -1,58 +1,31 @@
-import { observer } from "mobx-react-lite";
+ import { observer } from "mobx-react-lite";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import "../App.css";
-
-import {NavBar} from "./navBarPresenter.jsx";
-import HomePresenter from "./homePresenter";
-import StatsView from "../views/statsView";
+import NavBarView from "../views/navBarView";
+import HomeView from "../views/homeView";
+import StatsPresenter from "./statsPresenter";
+import TrainView from "../views/trainView";
 import RecordsView from "../views/recordsView";
-import { AuthPresenter } from "./authPresenter";
-import { ProfilePresenter } from "./profilePresenter";
-import { authModel } from "../models/authModel";
-import {
-  connectAuthSession,
-  connectToPersistence,
-  connectProfilePersistence,
-} from "../models/firestoreModel";
-import { profileModel } from "../models/profileModel";
-import { sessionModel } from "../models/sessionModel";
-import { trainModel } from "../models/trainModel";
-import { Train } from "./trainPresenter.jsx";
+import ProfileView from "../views/profileView";
+import { StatsProvider } from './statsContext';
 
-connectAuthSession(sessionModel);
-connectToPersistence(trainModel, sessionModel);
-connectProfilePersistence(profileModel, sessionModel);
 
-const App = observer(function App() {
-  if (!sessionModel.authReady) {
-    return null;
-  }
-
-  if (!sessionModel.user) {
+const App = observer(
+  function App(props) {
     return (
       <BrowserRouter>
-        <Routes>
-          <Route path="*" element={<AuthPresenter model={authModel} />} />
-        </Routes>
+        <StatsProvider>
+          <NavBarView/> 
+          <Routes>
+            <Route path="/" element={<HomeView/>}/>
+            <Route path="/stats" element={<StatsPresenter/>}/>
+            <Route path="/train" element={<TrainView/>}/>
+            <Route path="/records" element={<RecordsView/>}/>
+            <Route path="/profile" element={<ProfileView/>}/>
+          </Routes>
+        </StatsProvider>
       </BrowserRouter>
     );
   }
-
-  return (
-    <BrowserRouter>
-      <NavBar/>
-      <Routes>
-        <Route path="/" element={<HomePresenter model={trainModel}/>}/>
-        <Route path="/stats" element={<StatsView />} />
-        <Route path="/train" element={<Train model={trainModel} />} />
-        <Route path="/records" element={<RecordsView />} />
-        <Route path="/profile" element={<ProfilePresenter model={profileModel} />} />
-      </Routes>
-    </BrowserRouter>
-  );
-});
-
+);
 
 export default App;
-
-
