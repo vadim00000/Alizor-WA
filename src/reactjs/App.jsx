@@ -6,23 +6,37 @@ import StatsView from "../views/statsView";
 import TrainView from "../views/trainView";
 import RecordsView from "../views/recordsView";
 import ProfileView from "../views/profileView";
+import { AuthPresenter } from "../presenters/authPresenter";
+import { authModel } from "../models/authModel";
+import { sessionModel } from "../models/sessionModel";
 
+const App = observer(function App() {
+  if (!sessionModel.authReady) {
+    return null;
+  }
 
-const App = observer(
-  function App(props) {
+  if (!sessionModel.user) {
     return (
       <BrowserRouter>
-        <NavBarView/> 
         <Routes>
-          <Route path="/" element={<HomeView/>}/>
-          <Route path="/stats" element={<StatsView/>}/>
-          <Route path="/train" element={<TrainView/>}/>
-          <Route path="/records" element={<RecordsView/>}/>
-          <Route path="/profile" element={<ProfileView/>}/>
+          <Route path="*" element={<AuthPresenter model={authModel} />} />
         </Routes>
       </BrowserRouter>
     );
   }
-);
+
+  return (
+    <BrowserRouter>
+      <NavBarView />
+      <Routes>
+        <Route path="/" element={<HomeView />} />
+        <Route path="/stats" element={<StatsView />} />
+        <Route path="/train" element={<TrainView />} />
+        <Route path="/records" element={<RecordsView />} />
+        <Route path="/profile" element={<ProfileView />} />
+      </Routes>
+    </BrowserRouter>
+  );
+});
 
 export default App;
