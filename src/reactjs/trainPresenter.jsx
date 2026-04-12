@@ -2,32 +2,44 @@ import { observer } from "mobx-react-lite";
 import { BodyPartsView } from "../views/bodyPartsView";
 import { ExercisesView } from "../views/exercisesView";
 import { WorkoutView } from "../views/workoutView";
+import { WorkoutsView } from "../views/workoutsView";
 import { SuspenseView } from "../views/suspenseView";
 
 const Train = observer(function TrainRender(props){
 
+    const model = props.model;
+
     function searchACB(){
-        props.model.doSearch();
+        model.doSearch();
     }
 
     function selectBodyPartACB(bodyPart){
-        props.model.setBodyPart(bodyPart);
+        model.setBodyPart(bodyPart);
     }
 
     function addExerciseACB(ex){
-        props.model.addToWorkout({
-            ...ex,
-            sets: 3,
-            reps: 8
-        });
+        model.addToWorkout(ex);
     }
 
     function removeExerciseACB(ex){
-        props.model.removeFromWorkout(ex);
+        model.removeFromWorkout(ex);
     }
 
+    function createWorkoutACB(name){
+        model.createWorkout(name);
+    }
+
+    function selectWorkoutACB(id){
+        model.selectWorkout(id);
+    }
+
+    // 👉 get selected workout
+    const selectedWorkout = model.workouts.find(
+        w => w.id === model.selectedWorkoutId
+    );
+
     function bodyPartsOrSuspense(){
-        const state = props.model.searchResultsPromiseState;
+        const state = model.searchResultsPromiseState;
 
         if(state.data){
             return (
@@ -47,7 +59,7 @@ const Train = observer(function TrainRender(props){
     }
 
     function exercisesOrSuspense(){
-        const state = props.model.exercisesPromiseState;
+        const state = model.exercisesPromiseState;
 
         if(state.data){
             return (
@@ -63,6 +75,23 @@ const Train = observer(function TrainRender(props){
 
     return (
         <>
+
+            <input
+                placeholder="New workout name"
+                onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                        createWorkoutACB(e.target.value);
+                        e.target.value = "";
+                    }
+                }}
+            />
+
+            <WorkoutsView
+                workouts={model.workouts}
+                selectedWorkoutId={model.selectedWorkoutId}
+                onSelectWorkout={selectWorkoutACB}
+            />
+
             <button onClick={searchACB}>
                 Load body parts
             </button>
@@ -74,9 +103,10 @@ const Train = observer(function TrainRender(props){
             {exercisesOrSuspense()}
 
             <WorkoutView
-                workout={props.model.exercises}
+                workout={selectedWorkout?.exercises || []}
                 onRemoveExercise={removeExerciseACB}
             />
+
         </>
     );
 });

@@ -5,10 +5,10 @@ export function WorkoutView(props) {
 
             <ul>
                 {props.workout.map(ex => (
-                    <li key={ex.id}>
+                 <li key={ex.id || ex.name}>
                         {ex.name} — {ex.sets} x {ex.reps}
 
-                        <button onClick={() => prop.onRemoveExercise(ex)}>
+                        <button onClick={() => props.onRemoveExercise(ex)}>
                             x
                         </button>
                     </li>
