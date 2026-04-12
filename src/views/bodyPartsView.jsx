@@ -1,9 +1,9 @@
-export function BodyPartsView({ bodyParts, onSelectBodyPart }) {
+export function BodyPartsView(props) {
     return (
         <ul>
-            {bodyParts.map(bp => (
+            {props.bodyParts.map(bp => (
                 <li key={bp}>
-                    <button onClick={() => onSelectBodyPart(bp)}>
+                    <button onClick={() => props.onSelectBodyPart(bp)}>
                         {bp}
                     </button>
                 </li>
