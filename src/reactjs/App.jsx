@@ -3,9 +3,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NavBarView from "../views/navBarView";
 import HomeView from "../views/homeView";
 import StatsView from "../views/statsView";
-import TrainView from "../views/trainView";
 import RecordsView from "../views/recordsView";
 import ProfileView from "../views/profileView";
+import { Train } from "./trainPresenter.jsx";
+
+
 
 
 const App = observer(
@@ -16,7 +18,7 @@ const App = observer(
         <Routes>
           <Route path="/" element={<HomeView/>}/>
           <Route path="/stats" element={<StatsView/>}/>
-          <Route path="/train" element={<TrainView/>}/>
+          <Route path="/train" element={<Train model={props.model} />}/>
           <Route path="/records" element={<RecordsView/>}/>
           <Route path="/profile" element={<ProfileView/>}/>
         </Routes>
