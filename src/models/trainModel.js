@@ -9,6 +9,7 @@ import { searchExercises, getExercisesByBodyPart } from "../exerciseSource";
 import { resolvePromise } from "../resolvePromise";
 import { db } from "../firebase/config";
 import { createEmptyWorkout, createWorkoutExerciseFromApi } from "../workout";
+import { deleteDoc } from "firebase/firestore";
 
 export const trainModel = {
   workouts: [],
@@ -188,6 +189,22 @@ export const trainModel = {
     resolvePromise(promise, this.saveWorkoutPromiseState);
     return promise;
   },
+
+   removeSelectedWorkout(userId = this.currentUserId){
+    if (!userId || this.selectedWorkoutId === null) return Promise.resolve();
+
+    const workoutId = this.selectedWorkoutId;
+
+    const promise = deleteDoc(
+        doc(db, "users", userId, "workouts", String(workoutId))
+    );
+
+    this.workouts = this.workouts.filter((w) => w.id !== workoutId);
+
+    this.selectedWorkoutId = null;
+    resolvePromise(promise, this.saveWorkoutPromiseState);
+    return promise;
+}
 };
 
 makeAutoObservable(trainModel);
