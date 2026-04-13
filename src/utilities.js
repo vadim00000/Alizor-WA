@@ -1,13 +1,11 @@
+export function getWeeklyStats(workouts = []) {
+    const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
 
-export function getWeeklyStats(workoutHistory) {
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-        
-        const recentWorkouts = workoutHistory.filter(session => {
-            return new Date(session.date) >= oneWeekAgo;
-        });
+    const recentWorkouts = workouts.filter((session) => {
+        const timestamp = Number(session.createdAt);
 
-        const workoutsCount = recentWorkouts.length;
+        return Number.isFinite(timestamp) && timestamp >= oneWeekAgo;
+    });
 
-        return workoutsCount;
-    }
+    return recentWorkouts.length;
+}

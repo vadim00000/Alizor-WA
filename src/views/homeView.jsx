@@ -27,7 +27,7 @@ export default function HomeView(props) {
                         <ul>
                             {props.recentWorkouts.map(session => (
                                 <li key={session.id}>
-                                    {new Date(session.date).toLocaleDateString()}
+                                    {new Date(session.createdAt).toLocaleDateString()}
                                 </li>
                             ))}
                         </ul>
