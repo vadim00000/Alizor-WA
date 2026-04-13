@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { logoutUser } from "../firebase/auth";
 
 const NAV_ITEMS = [
   { path: "/",        label: "Home"},
@@ -9,7 +10,11 @@ const NAV_ITEMS = [
 ];
 
 export default function NavBarView() {
-    return (
+  function onLogoutACB() {
+    void logoutUser();
+  }
+
+  return (
     <nav className="navbar">
         <ul className="navbar-ul">
             {NAV_ITEMS.map(item => (
@@ -19,6 +24,15 @@ export default function NavBarView() {
                 </NavLink>
             </li>
         ))}
+        <li>
+          <button
+            type="button"
+            className="navbar-logout"
+            onClick={onLogoutACB}
+          >
+            Log out
+          </button>
+        </li>
       </ul>
     </nav>
   );

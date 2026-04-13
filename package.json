@@ -10,11 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "firebase": "^12.12.0",
+    "mobx": "latest",
+    "mobx-react-lite": "latest",
     "react": "latest",
-    "mobx":"latest",
-    "mobx-react-lite":"latest",
-    "firebase":"latest",
-    "react-dom":"latest",
+    "react-dom": "latest",
     "react-router-dom": "latest"
   },
   "devDependencies": {

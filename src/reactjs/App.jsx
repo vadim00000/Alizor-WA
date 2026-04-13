@@ -4,26 +4,45 @@ import "../App.css";
 import NavBarView from "../views/navBarView";
 import HomePresenter from "./homePresenter";
 import StatsView from "../views/statsView";
-import TrainView from "../views/trainView";
 import RecordsView from "../views/recordsView";
 import ProfileView from "../views/profileView";
+import { AuthPresenter } from "../presenters/authPresenter";
+import { authModel } from "../models/authModel";
+import { connectToPersistence } from "../models/firestoreModel";
+import { sessionModel } from "../models/sessionModel";
+import { trainModel } from "../models/trainModel";
+import { Train } from "./trainPresenter.jsx";
 
-const App = observer(
-  function App(props) {
+connectToPersistence(trainModel, sessionModel);
+
+const App = observer(function App() {
+  if (!sessionModel.authReady) {
+    return null;
+  }
+
+  if (!sessionModel.user) {
     return (
       <BrowserRouter>
-        <NavBarView/> 
         <Routes>
-          <Route path="/" element={<HomePresenter model={props.model}/>}/>
-          <Route path="/stats" element={<StatsView/>}/>
-          <Route path="/train" element={<TrainView/>}/>
-          <Route path="/records" element={<RecordsView/>}/>
-          <Route path="/profile" element={<ProfileView/>}/>
+          <Route path="*" element={<AuthPresenter model={authModel} />} />
         </Routes>
       </BrowserRouter>
     );
   }
-);
+
+  return (
+    <BrowserRouter>
+      <NavBarView />
+      <Routes>
+        <Route path="/" element={<HomePresenter model={props.model}/>}/>
+        <Route path="/stats" element={<StatsView />} />
+        <Route path="/train" element={<Train model={trainModel} />} />
+        <Route path="/records" element={<RecordsView />} />
+        <Route path="/profile" element={<ProfileView />} />
+      </Routes>
+    </BrowserRouter>
+  );
+});
 
 
 export default App;
