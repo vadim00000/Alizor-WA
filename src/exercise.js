@@ -1,0 +1,35 @@
+/**
+ * @typedef {Object} Exercise
+ * @property {string} bodyPart
+ * @property {string} equipment
+ * @property {string} id
+ * @property {string} name
+ * @property {string} target
+ * @property {string[]} secondaryMuscles
+ * @property {string[]} instructions
+ * @property {string} description
+ * @property {string} difficulty
+ * @property {string} category
+ * @property {string} [gifUrl] might be present if returned by ExerciseDBAPI
+ */
+
+/** Example taken from ExerciseDB API */
+export const exampleExercise = {
+  bodyPart: "lower legs",
+  equipment: "leverage machine",
+  id: "0605",
+  name: "lever standing calf raise",
+  target: "calves",
+  secondaryMuscles: ["soleus", "ankle stabilizers"],
+  instructions: [
+    "Adjust the machine to your height and stand with your feet shoulder-width apart.",
+    "Place your shoulders under the pads and hold onto the handles for stability.",
+    "Raise your heels as high as possible by extending your ankles.",
+    "Pause for a moment at the top, then slowly lower your heels back down to the starting position.",
+    "Repeat for the desired number of repetitions.",
+  ],
+  description:
+    "The lever standing calf raise is a strength exercise performed on a leverage machine, targeting the calves. It involves raising and lowering the heels while standing, using resistance provided by the machine.",
+  difficulty: "beginner",
+  category: "strength",
+};

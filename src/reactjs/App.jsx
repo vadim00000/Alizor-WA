@@ -3,12 +3,16 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NavBarView from "../views/navBarView";
 import HomeView from "../views/homeView";
 import StatsView from "../views/statsView";
-import TrainView from "../views/trainView";
 import RecordsView from "../views/recordsView";
 import ProfileView from "../views/profileView";
 import { AuthPresenter } from "../presenters/authPresenter";
 import { authModel } from "../models/authModel";
+import { connectToPersistence } from "../models/firestoreModel";
 import { sessionModel } from "../models/sessionModel";
+import { trainModel } from "../models/trainModel";
+import { Train } from "./trainPresenter.jsx";
+
+connectToPersistence(trainModel, sessionModel);
 
 const App = observer(function App() {
   if (!sessionModel.authReady) {
@@ -31,7 +35,7 @@ const App = observer(function App() {
       <Routes>
         <Route path="/" element={<HomeView />} />
         <Route path="/stats" element={<StatsView />} />
-        <Route path="/train" element={<TrainView />} />
+        <Route path="/train" element={<Train model={trainModel} />} />
         <Route path="/records" element={<RecordsView />} />
         <Route path="/profile" element={<ProfileView />} />
       </Routes>
