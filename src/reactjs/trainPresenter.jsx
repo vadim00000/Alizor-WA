@@ -49,6 +49,10 @@ const Train = observer(function TrainRender(props){
         model.saveSelectedWorkout();
     }
 
+    function removeWorkoutACB() {
+        model.removeSelectedWorkout();
+    }
+
     const selectedWorkout = model.workouts.find(
         w => w.id === model.selectedWorkoutId
     );
@@ -142,6 +146,20 @@ const Train = observer(function TrainRender(props){
                         onUpdateSet={updateSetACB}
                         onAddSet={addSetACB}
                         onRemoveSet={removeSetACB}
+                        onRemoveWorkout={removeWorkoutACB}
+                    />
+                    {
+                        selectedWorkout && <button
+                        type="button"
+                        onClick={removeWorkoutACB}
+
+            >
+                        Delete workout
+                    </button>
+
+                    }
+                     {
+                        (selectedWorkout && !saveInProgress) && <button
                     />
                     <button
                         type="button"
@@ -150,6 +168,8 @@ const Train = observer(function TrainRender(props){
                     >
                         Save my workout
                     </button>
+
+                     }
                     {model.saveWorkoutPromiseState.error && (
                         <div>
                             Could not save workout:{" "}
