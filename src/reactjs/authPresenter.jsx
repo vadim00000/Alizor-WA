@@ -1,4 +1,4 @@
-import { AuthView } from "../views/authView"
+import { AuthView } from "../views/authView";
 import { observer } from "mobx-react-lite";
 
 const AuthPresenter = observer(

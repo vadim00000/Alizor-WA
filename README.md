@@ -62,12 +62,12 @@ src/
     trainModel.js       # Workout and training logic
 
   presenters/           # Connect models with views (logic + interaction)
-    authPresenter.jsx   # Handles authentication flow
     profilePresenter.jsx# Handles profile interactions
 
   reactjs/              # Main React presenters and app orchestration
     App.jsx             # Root React component
     main.jsx            # Application entry point
+    authPresenter.jsx   # Authentication flow
     homePresenter.jsx   # Home page logic
     navBarPresenter.jsx # Navigation bar logic
     profilePresenter.jsx# Profile logic (duplicate responsibility)

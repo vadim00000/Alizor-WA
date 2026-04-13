@@ -5,7 +5,7 @@ import NavBarView from "../views/navBarView";
 import HomePresenter from "./homePresenter";
 import StatsView from "../views/statsView";
 import RecordsView from "../views/recordsView";
-import { AuthPresenter } from "../presenters/authPresenter";
+import { AuthPresenter } from "./authPresenter";
 import { ProfilePresenter } from "../presenters/profilePresenter";
 import { authModel } from "../models/authModel";
 import {
