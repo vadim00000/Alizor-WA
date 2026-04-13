@@ -13,6 +13,7 @@ import { deleteDoc } from "firebase/firestore";
 
 export const trainModel = {
   workouts: [],
+  workoutHistory: [],
   selectedWorkoutId: null,
   currentUserId: null,
 
@@ -30,9 +31,21 @@ export const trainModel = {
     this.selectedWorkoutId = workout.id;
   },
 
+    getWeekWorkouts() {
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        return this.workouts
+            .filter(workout => new Date(workout.date) >= oneWeekAgo)
+    },
+
   selectWorkout(id) {
     this.selectedWorkoutId = id;
   },
+
+  getWorkout(id) {
+        return this.workouts.find((workout) => workout.id === id);
+    },
 
   addToWorkout(exercise) {
     if (this.selectedWorkoutId === null) return;

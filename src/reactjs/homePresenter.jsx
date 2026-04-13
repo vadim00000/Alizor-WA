@@ -5,10 +5,7 @@ import { useState } from "react";
 
 
 export default observer(function HomePresenter(props) {
-    
     const workoutsCount = getWeeklyStats(props.model.workoutHistory);
-
-    
     const [isOpen, setIsOpen] = useState(false);
     const recentWorkouts = props.model.getWeekWorkouts();
 
@@ -18,7 +15,6 @@ export default observer(function HomePresenter(props) {
             recentWorkouts={recentWorkouts}
             showHistory={isOpen}
             onToggleHistory={() => setIsOpen(!isOpen)}
-            getWorkout={(id) => props.model.getWorkout(id)}
         />
     );
 });

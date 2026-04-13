@@ -18,16 +18,21 @@ export default function HomeView(props) {
             <button onClick={props.onToggleHistory}>
                 {props.showHistory ? "Hide" : "Show"} weekly history
             </button>
+
             {props.showHistory && (
-                <ul>
-                    {props.recentWorkouts.map(session => (
-                        <li key={session.id}>
-                            {new Date(session.date).toLocaleDateString()}
-                            <strong> {props.getWorkout(session.workoutId).name} </strong>
-                            ({session.duration} min)
-                        </li>
-                    ))}
-                </ul>
+                <div>
+                    {props.recentWorkouts.length === 0 ? (
+                        <p>No workouts recorded in the last 7 days.</p>
+                    ) : (
+                        <ul>
+                            {props.recentWorkouts.map(session => (
+                                <li key={session.id}>
+                                    {new Date(session.date).toLocaleDateString()}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
             )}
         </div>
     </div>

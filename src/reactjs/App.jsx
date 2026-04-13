@@ -34,7 +34,7 @@ const App = observer(function App() {
     <BrowserRouter>
       <NavBarView />
       <Routes>
-        <Route path="/" element={<HomePresenter model={props.model}/>}/>
+        <Route path="/" element={<HomePresenter model={trainModel}/>}/>
         <Route path="/stats" element={<StatsView />} />
         <Route path="/train" element={<Train model={trainModel} />} />
         <Route path="/records" element={<RecordsView />} />

@@ -1,5 +1,4 @@
 
-
 export function getWeeklyStats(workoutHistory) {
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
