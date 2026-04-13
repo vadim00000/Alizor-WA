@@ -25,6 +25,18 @@ const Train = observer(function TrainRender(props){
         model.removeFromWorkout(ex);
     }
 
+    function updateSetACB(ex, setIndex, patch) {
+        model.updateSet(ex, setIndex, patch);
+    }
+
+    function addSetACB(ex) {
+        model.addSet(ex);
+    }
+
+    function removeSetACB(ex, setIndex) {
+        model.removeSet(ex, setIndex);
+    }
+
     function createWorkoutACB(name){
         model.createWorkout(name);
     }
@@ -33,9 +45,25 @@ const Train = observer(function TrainRender(props){
         model.selectWorkout(id);
     }
 
+    function saveWorkoutACB() {
+        model.saveSelectedWorkout();
+    }
+
     const selectedWorkout = model.workouts.find(
         w => w.id === model.selectedWorkoutId
     );
+
+    const loadState = model.loadWorkoutsPromiseState;
+    const workoutsLoading =
+        !!loadState.promise &&
+        loadState.data === null &&
+        !loadState.error;
+
+    const saveState = model.saveWorkoutPromiseState;
+    const saveInProgress =
+        !!saveState.promise &&
+        saveState.data === null &&
+        !saveState.error;
 
     function bodyPartsOrSuspense(){
         const state = model.searchResultsPromiseState;
@@ -85,11 +113,15 @@ const Train = observer(function TrainRender(props){
                 }}
             />
 
-            <WorkoutsView
-                workouts={model.workouts}
-                selectedWorkoutId={model.selectedWorkoutId}
-                onSelectWorkout={selectWorkoutACB}
-            />
+            {workoutsLoading ? (
+                <p>Loading workouts…</p>
+            ) : (
+                <WorkoutsView
+                    workouts={model.workouts}
+                    selectedWorkoutId={model.selectedWorkoutId}
+                    onSelectWorkout={selectWorkoutACB}
+                />
+            )}
 
             <button onClick={searchACB}>
                 Load body parts
@@ -101,10 +133,32 @@ const Train = observer(function TrainRender(props){
             <h2>Exercises</h2>
             {exercisesOrSuspense()}
 
-            <WorkoutView
-                workout={selectedWorkout?.exercises || []}
-                onRemoveExercise={removeExerciseACB}
-            />
+            {!workoutsLoading && (
+                <>
+                    <WorkoutView
+                        workoutName={selectedWorkout?.name}
+                        workout={selectedWorkout?.exercises || []}
+                        onRemoveExercise={removeExerciseACB}
+                        onUpdateSet={updateSetACB}
+                        onAddSet={addSetACB}
+                        onRemoveSet={removeSetACB}
+                    />
+                    <button
+                        type="button"
+                        onClick={saveWorkoutACB}
+                        disabled={!selectedWorkout || saveInProgress}
+                    >
+                        Save my workout
+                    </button>
+                    {model.saveWorkoutPromiseState.error && (
+                        <div>
+                            Could not save workout:{" "}
+                            {model.saveWorkoutPromiseState.error?.message
+                                ?? String(model.saveWorkoutPromiseState.error)}
+                        </div>
+                    )}
+                </>
+            )}
         </>
     );
 });

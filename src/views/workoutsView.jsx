@@ -7,6 +7,7 @@ export function WorkoutsView(props) {
                 {props.workouts.map(w => (
                     <li key={w.id}>
                         <button
+                            type="button"
                             style={{
                                 fontWeight: w.id === props.selectedWorkoutId ? "bold" : "normal"
                             }}

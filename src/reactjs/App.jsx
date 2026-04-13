@@ -7,9 +7,12 @@ import RecordsView from "../views/recordsView";
 import ProfileView from "../views/profileView";
 import { AuthPresenter } from "../presenters/authPresenter";
 import { authModel } from "../models/authModel";
+import { connectToPersistence } from "../models/firestoreModel";
 import { sessionModel } from "../models/sessionModel";
 import { trainModel } from "../models/trainModel";
 import { Train } from "./trainPresenter.jsx";
+
+connectToPersistence(trainModel, sessionModel);
 
 const App = observer(function App() {
   if (!sessionModel.authReady) {

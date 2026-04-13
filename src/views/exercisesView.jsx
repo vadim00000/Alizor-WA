@@ -12,7 +12,10 @@ export function ExercisesView({ exercises, onAddExercise }) {
                             <img src={ex.gifUrl} width="100" alt={ex.name}/>
                         )}
 
-                        <button onClick={() => onAddExercise(ex)}>
+                        <button
+                            type="button"
+                            onClick={() => onAddExercise(ex)}
+                        >
                             +
                         </button>
                     </li>
