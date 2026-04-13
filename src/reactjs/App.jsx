@@ -6,7 +6,7 @@ import HomePresenter from "./homePresenter";
 import StatsView from "../views/statsView";
 import RecordsView from "../views/recordsView";
 import { AuthPresenter } from "./authPresenter";
-import { ProfilePresenter } from "../presenters/profilePresenter";
+import { ProfilePresenter } from "./profilePresenter";
 import { authModel } from "../models/authModel";
 import {
   connectToPersistence,
