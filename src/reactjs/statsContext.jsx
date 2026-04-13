@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { model as trainModel } from './trainModel';
 
 const DEFAULT_MUSCLES = ['Chest','Back','Shoulders','Biceps','Triceps','Legs','Core','Glutes'];
 
@@ -28,43 +27,57 @@ function computeMusclePercentagesFromSessions(sessions = [], forDate = new Date(
   return { percentages, totalSessionsThisMonth: total };
 }
 
-export function StatsProvider({ children, initialData }) {
-  const [statsData, setStatsData] = useState(
-    initialData ?? {
-      totalVolume: 34200,
-      comparison: 18,
-      monthlyData: [
-        { month: 'Jan', volume: 2500 },
-        { month: 'Feb', volume: 2800 },
-        { month: 'Mar', volume: 2100 },
-        { month: 'Apr', volume: 3200 },
-        { month: 'May', volume: 2900 },
-        { month: 'Jun', volume: 3100 },
-        { month: 'Jul', volume: 2600 },
-        { month: 'Aug', volume: 3400 },
-        { month: 'Sep', volume: 2700 },
-        { month: 'Oct', volume: 3300 },
-        { month: 'Nov', volume: 2900 },
-        { month: 'Dec', volume: 3600 },
-      ],
-      totalSessions: 47,
-      avgPerWeek: 4.2,
-      totalTime: 46,
-      bestStreak: 18,
-        // personal records (PRs)
-        prs: initialData?.prs ?? [
-          { name: 'Bench Press', date: '2026-03-19', value: 102, unit: 'kg', allTime: true },
-          { name: 'Squat', date: '2026-02-28', value: 140, unit: 'kg' },
-          { name: 'Deadlift', date: '2026-01-15', value: 170, unit: 'kg' },
-          { name: 'OHP', date: '2026-03-10', value: 72, unit: 'kg' },
-          { name: 'Pull-ups', date: '2026-03-05', value: 15, unit: 'reps' },
-          { name: 'Dips', date: '2026-02-20', value: 30, unit: 'kg', note: '+30' },
-        ],
-      // optional: sessions array and computed musclePercentages
-      sessions: initialData?.sessions ?? [],
-      musclePercentages: initialData?.musclePercentages ?? {},
-    }
-  );
+export function StatsProvider({ children, initialData, trainModel }) {
+  const deriveFromTrainModel = () => {
+    if (!trainModel) return null;
+    return {
+      totalVolume: trainModel.totalVolume ?? 0,
+      comparison: trainModel.comparison ?? 0,
+      monthlyData: trainModel.monthlyData ?? [],
+      totalSessions: trainModel.totalSessions ?? (trainModel.sessions ? trainModel.sessions.length : 0),
+      avgPerWeek: trainModel.avgPerWeek ?? 0,
+      totalTime: trainModel.totalTime ?? 0,
+      bestStreak: trainModel.bestStreak ?? 0,
+      prs: trainModel.prs ?? [],
+      sessions: trainModel.sessions ?? [],
+      musclePercentages: trainModel.musclePercentages ?? {},
+    };
+  };
+
+  const defaultData = {
+    totalVolume: 34200,
+    comparison: 18,
+    monthlyData: [
+      { month: 'Jan', volume: 2500 },
+      { month: 'Feb', volume: 2800 },
+      { month: 'Mar', volume: 2100 },
+      { month: 'Apr', volume: 3200 },
+      { month: 'May', volume: 2900 },
+      { month: 'Jun', volume: 3100 },
+      { month: 'Jul', volume: 2600 },
+      { month: 'Aug', volume: 3400 },
+      { month: 'Sep', volume: 2700 },
+      { month: 'Oct', volume: 3300 },
+      { month: 'Nov', volume: 2900 },
+      { month: 'Dec', volume: 3600 },
+    ],
+    totalSessions: 47,
+    avgPerWeek: 4.2,
+    totalTime: 46,
+    bestStreak: 18,
+    prs: [
+      { name: 'Bench Press', date: '2026-03-19', value: 102, unit: 'kg', allTime: true },
+      { name: 'Squat', date: '2026-02-28', value: 140, unit: 'kg' },
+      { name: 'Deadlift', date: '2026-01-15', value: 170, unit: 'kg' },
+      { name: 'OHP', date: '2026-03-10', value: 72, unit: 'kg' },
+      { name: 'Pull-ups', date: '2026-03-05', value: 15, unit: 'reps' },
+      { name: 'Dips', date: '2026-02-20', value: 30, unit: 'kg', note: '+30' },
+    ],
+    sessions: [],
+    musclePercentages: {},
+  };
+
+  const [statsData, setStatsData] = useState(() => initialData ?? deriveFromTrainModel() ?? defaultData);
 
   // Utility to merge partial updates coming from other modules
   const updateStats = (patch) => {
@@ -80,7 +93,7 @@ export function StatsProvider({ children, initialData }) {
     });
   };
 
-  // Subscribe to the trainModel so external modules (trainer UI) can push workouts
+  // Subscribe to the trainModel (injected) so external modules can push workouts
   useEffect(() => {
     if (!trainModel || typeof trainModel.subscribe !== 'function') return;
     const unsub = trainModel.subscribe((event) => {
@@ -98,7 +111,7 @@ export function StatsProvider({ children, initialData }) {
     return () => {
       try { unsub && unsub(); } catch (e) {}
     };
-  }, []);
+  }, [trainModel]);
 
   const addPR = (pr) => {
     setStatsData(prev => ({ ...prev, prs: [...(prev.prs||[]), pr] }));
@@ -160,7 +173,7 @@ export function StatsProvider({ children, initialData }) {
   };
 
   return (
-    <StatsContext.Provider value={{ statsData, setStatsData, updateStats, addSession, computeMusclePercentages }}>
+    <StatsContext.Provider value={{ statsData, setStatsData, updateStats, addSession, computeMusclePercentages, trainModel }}>
       {children}
     </StatsContext.Provider>
   );
