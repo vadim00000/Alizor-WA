@@ -16,13 +16,13 @@ export default function NavBarView() {
 
   return (
     <nav className="navbar">
-      <ul>
-        {NAV_ITEMS.map((item) => (
-          <li key={item.path}>
-            <NavLink to={item.path}>
-              {item.label}
-            </NavLink>
-          </li>
+        <ul className="navbar-ul">
+            {NAV_ITEMS.map(item => (
+            <li key={item.path}>
+                <NavLink to={item.path}>
+                {item.label}
+                </NavLink>
+            </li>
         ))}
         <li>
           <button
