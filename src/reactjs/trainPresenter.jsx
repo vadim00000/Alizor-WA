@@ -159,8 +159,7 @@ const Train = observer(function TrainRender(props){
 
                     }
                      {
-                        (selectedWorkout && !saveInProgress) && <button
-                    />
+                        (selectedWorkout && !saveInProgress) &&
                     <button
                         type="button"
                         onClick={saveWorkoutACB}
