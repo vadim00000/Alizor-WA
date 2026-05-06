@@ -1,7 +1,8 @@
 import { observer } from "mobx-react-lite";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "../App.css";
-import NavBarView from "../views/navBarView";
+
+import {NavBar} from "./navBarPresenter.jsx";
 import HomePresenter from "./homePresenter";
 import StatsView from "../views/statsView";
 import RecordsView from "../views/recordsView";
@@ -37,7 +38,7 @@ const App = observer(function App() {
 
   return (
     <BrowserRouter>
-      <NavBarView />
+      <NavBar/>
       <Routes>
         <Route path="/" element={<HomePresenter model={trainModel}/>}/>
         <Route path="/stats" element={<StatsView />} />
