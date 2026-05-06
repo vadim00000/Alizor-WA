@@ -1,34 +1,26 @@
-import { NavLink } from "react-router-dom";
-import { logoutUser } from "../firebase/auth";
-
-const NAV_ITEMS = [
-  { path: "/",        label: "Home"},
-  { path: "/stats",   label: "Stats"},
-  { path: "/train",   label: "Train"},
-  { path: "/records", label: "Records"},
-  { path: "/profile", label: "Profile"}
-];
-
-export default function NavBarView() {
-  function onLogoutACB() {
-    void logoutUser();
-  }
+export default function NavBarView(props) {
 
   return (
     <nav className="navbar">
         <ul className="navbar-ul">
-            {NAV_ITEMS.map(item => (
+            {props.NAV_ITEMS.map(item => (
             <li key={item.path}>
-                <NavLink to={item.path}>
-                {item.label}
-                </NavLink>
+                <a 
+                    href={item.path} 
+                    onClick={(e) => {
+                        e.preventDefault();
+                        props.onNavigate(item.path);
+                    }}
+                >
+                    {item.label}
+                </a>
             </li>
         ))}
         <li>
           <button
             type="button"
             className="navbar-logout"
-            onClick={onLogoutACB}
+            onClick={props.onLogout}
           >
             Log out
           </button>
