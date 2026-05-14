@@ -10,6 +10,7 @@ import { AuthPresenter } from "./authPresenter";
 import { ProfilePresenter } from "./profilePresenter";
 import { authModel } from "../models/authModel";
 import {
+  connectAuthSession,
   connectToPersistence,
   connectProfilePersistence,
 } from "../models/firestoreModel";
@@ -18,6 +19,7 @@ import { sessionModel } from "../models/sessionModel";
 import { trainModel } from "../models/trainModel";
 import { Train } from "./trainPresenter.jsx";
 
+connectAuthSession(sessionModel);
 connectToPersistence(trainModel, sessionModel);
 connectProfilePersistence(profileModel, sessionModel);
 

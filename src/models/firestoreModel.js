@@ -1,12 +1,19 @@
 import { reaction } from "mobx";
+import { subscribeAuth } from "../persistence/sessionPersistence";
 
+let authSessionConnected = false;
 let trainPersistenceConnected = false;
 let profilePersistenceConnected = false;
 
-/**
- * Connect train model to Firestore lifecycle using MobX reaction.
- * It reloads workouts whenever auth user changes.
- */
+export function connectAuthSession(sessionModel) {
+  if (authSessionConnected) return;
+  authSessionConnected = true;
+
+  subscribeAuth((firebaseUser) => {
+    sessionModel.setSession(firebaseUser);
+  });
+}
+
 export function connectToPersistence(model, sessionModel, watchFunction = reaction) {
   if (trainPersistenceConnected) return;
   trainPersistenceConnected = true;
@@ -21,9 +28,6 @@ export function connectToPersistence(model, sessionModel, watchFunction = reacti
   );
 }
 
-/**
- * Load user profile document when auth user changes.
- */
 export function connectProfilePersistence(model, sessionModel, watchFunction = reaction) {
   if (profilePersistenceConnected) return;
   profilePersistenceConnected = true;

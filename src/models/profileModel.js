@@ -1,7 +1,9 @@
 import { makeAutoObservable } from "mobx";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "../firebase/config";
 import { resolvePromise } from "../resolvePromise";
+import {
+  fetchUserProfile,
+  saveUserProfile,
+} from "../persistence/profilePersistence";
 
 export const profileModel = {
   age: null,
@@ -36,6 +38,17 @@ export const profileModel = {
     this.targetWeightKg = null;
   },
 
+  applyProfileData(data) {
+    if (data) {
+      this.age = data.age ?? null;
+      this.sex = data.sex ?? null;
+      this.weightKg = data.weightKg ?? null;
+      this.targetWeightKg = data.targetWeightKg ?? null;
+    } else {
+      this._resetFields();
+    }
+  },
+
   loadProfile(userId = this.currentUserId) {
     this.currentUserId = userId ?? null;
     if (!userId) {
@@ -44,21 +57,12 @@ export const profileModel = {
       return;
     }
 
-    resolvePromise(
-      getDoc(doc(db, "users", userId)).then((snap) => {
-        const data = snap.data();
-        if (data) {
-          this.age = data.age ?? null;
-          this.sex = data.sex ?? null;
-          this.weightKg = data.weightKg ?? null;
-          this.targetWeightKg = data.targetWeightKg ?? null;
-        } else {
-          this._resetFields();
-        }
-        return snap;
-      }),
-      this.loadProfilePromiseState
-    );
+    const prms = fetchUserProfile(userId).then((data) => {
+      this.applyProfileData(data);
+      return data;
+    });
+
+    resolvePromise(prms, this.loadProfilePromiseState);
   },
 
   saveProfile(userId = this.currentUserId) {
@@ -71,11 +75,7 @@ export const profileModel = {
       targetWeightKg: this.targetWeightKg,
     };
 
-    const promise = setDoc(
-      doc(db, "users", userId),
-      payload,
-      { merge: true }
-    );
+    const promise = saveUserProfile(userId, payload);
     resolvePromise(promise, this.saveProfilePromiseState);
     return promise;
   },
