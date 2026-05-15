@@ -4,7 +4,7 @@ import "../App.css";
 
 import {NavBar} from "./navBarPresenter.jsx";
 import HomePresenter from "./homePresenter";
-import StatsView from "../views/statsView";
+import StatsPresenter from "./statsPresenter";
 import RecordsView from "../views/recordsView";
 import { AuthPresenter } from "./authPresenter";
 import { ProfilePresenter } from "./profilePresenter";
@@ -41,16 +41,14 @@ const App = observer(function App() {
 
   return (
     <BrowserRouter>
-      <StatsProvider trainModel={trainModel}>
         <NavBar/>
         <Routes>
           <Route path="/" element={<HomePresenter model={trainModel}/>}/>
-          <Route path="/stats" element={<StatsView />} />
+          <Route path="/stats" element={<StatsPresenter trainModel={trainModel}/>} />
           <Route path="/train" element={<Train model={trainModel} />} />
           <Route path="/records" element={<RecordsView />} />
           <Route path="/profile" element={<ProfilePresenter model={profileModel} />} />
         </Routes>
-      </StatsProvider>
     </BrowserRouter>
   );
 });
