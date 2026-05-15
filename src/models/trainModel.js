@@ -162,31 +162,6 @@ export const trainModel = {
     );
   },
 
-  loadWorkouts(userId = this.currentUserId) {
-    if (!userId) {
-      this.workouts = [];
-      this.selectedWorkoutId = null;
-      this.loadWorkoutsPromiseState = {};
-      return;
-    }
-
-    resolvePromise(
-      getDocs(collection(db, "users", userId, "workouts")).then((snapshot) => {
-        const loaded = snapshot.docs.map((d) => d.data());
-
-        this.workouts = loaded;
-        if (
-          this.selectedWorkoutId != null &&
-          !loaded.some((w) => w.id === this.selectedWorkoutId)
-        ) {
-          this.selectedWorkoutId = null;
-        }
-        return loaded;
-      }),
-      this.loadWorkoutsPromiseState
-    );
-  },
-
   saveSelectedWorkout() {
     const workout = this.workouts.find((w) => w.id === this.selectedWorkoutId);
     if (workout) {
