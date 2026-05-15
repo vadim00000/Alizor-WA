@@ -18,34 +18,34 @@ const ProfilePresenter = observer(function ProfilePresenterRender(props) {
 
   function setAgeACB(e) {
     const v = e.target.value;
-    model.setDraft("age", v === "" ? null : Number(v));
+    model.setAge(v === "" ? null : Number(v));
   }
 
   function setSexACB(e) {
     const v = e.target.value;
-    model.setDraft("sex", v === "" ? null : v);
+    model.setSex(v === "" ? null : v);
   }
 
   function setWeightKgACB(e) {
     const v = e.target.value;
-    model.setDraft("weightKg", v === "" ? null : Number(v));
+    model.setWeightKg(v === "" ? null : Number(v));
   }
 
   function setTargetWeightKgACB(e) {
     const v = e.target.value;
-    model.setDraft("targetWeightKg", v === "" ? null : Number(v));
+    model.setTargetWeightKg(v === "" ? null : Number(v));
   }
 
   function saveACB() {
-    model.commitChanges();
+    model.setSave();
   }
 
   return (
     <ProfileView
-      age={model.drafts.age}
-      sex={model.drafts.sex}
-      weightKg={model.drafts.weightKg}
-      targetWeightKg={model.drafts.targetWeightKg}
+      age={model.age}
+      sex={model.sex}
+      weightKg={model.weightKg}
+      targetWeightKg={model.targetWeightKg}
       profileLoading={profileLoading}
       saveInFlight={saveInFlight}
       loadError={loadState.error}

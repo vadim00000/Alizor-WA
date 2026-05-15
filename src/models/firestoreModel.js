@@ -104,16 +104,23 @@ export function connectProfilePersistence(model, sessionModel, watchFunction = r
   );
 
   watchFunction(
-    () => ({
-      age: model.age,
-      sex: model.sex,
-      weightKg: model.weightKg,
-      targetWeightKg: model.targetWeightKg,
-    }),
-    (profileData) => {
+    () => model.setToSave,
+    (shouldSave) => {
       const userId = sessionModel.user?.uid;
-      if (userId) {
-        const promise = setDoc(doc(db, "users", userId), profileData, { merge: true });
+      if (userId && shouldSave) {
+        const profileData = {
+          age: model.age,
+          sex: model.sex,
+          weightKg: model.weightKg,
+          targetWeightKg: model.targetWeightKg,
+        };
+
+        const promise = setDoc(doc(db, "users", userId), profileData, { merge: true })
+          .then(() => {
+            model.setToSave = false;
+            return profileData;
+          });
+
         resolvePromise(promise, model.saveProfilePromiseState);
       }
     }
