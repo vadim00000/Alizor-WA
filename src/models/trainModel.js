@@ -1,15 +1,7 @@
 import { makeAutoObservable } from "mobx";
-import {
-  collection,
-  doc,
-  getDocs,
-  setDoc,
-} from "firebase/firestore";
 import { searchExercises, getExercisesByBodyPart } from "../exerciseSource";
 import { resolvePromise } from "../resolvePromise";
-import { db } from "../firebase/config";
 import { createEmptyWorkout, createWorkoutExerciseFromApi } from "../workout";
-import { deleteDoc } from "firebase/firestore";
 
 export const trainModel = {
   workouts: [],
@@ -21,6 +13,19 @@ export const trainModel = {
   exercisesPromiseState: {},
   loadWorkoutsPromiseState: {},
   saveWorkoutPromiseState: {},
+
+  workoutToSave: null,  
+  workoutToDeleteId: null,
+
+  setWorkouts(loadedWorkouts) {
+    this.workouts = loadedWorkouts;
+    if (
+      this.selectedWorkoutId != null &&
+      !loadedWorkouts.some((w) => w.id === this.selectedWorkoutId)
+    ) {
+      this.selectedWorkoutId = null;
+    }
+  },
 
   createWorkout(name) {
     if (!name.trim()) return;
@@ -183,42 +188,21 @@ export const trainModel = {
     );
   },
 
-  saveSelectedWorkout(userId = this.currentUserId) {
-    if (!userId || this.selectedWorkoutId === null) return Promise.resolve();
-
+  saveSelectedWorkout() {
     const workout = this.workouts.find((w) => w.id === this.selectedWorkoutId);
-    if (!workout) return Promise.resolve();
-
-    const payload = {
-      id: workout.id,
-      name: workout.name,
-      exercises: workout.exercises,
-      createdAt: workout.createdAt,
-    };
-
-    const promise = setDoc(
-      doc(db, "users", userId, "workouts", String(workout.id)),
-      payload
-    );
-    resolvePromise(promise, this.saveWorkoutPromiseState);
-    return promise;
+    if (workout) {
+      this.workoutToSave = { ...workout };
+    }
   },
 
-   removeSelectedWorkout(userId = this.currentUserId){
-    if (!userId || this.selectedWorkoutId === null) return Promise.resolve();
-
-    const workoutId = this.selectedWorkoutId;
-
-    const promise = deleteDoc(
-        doc(db, "users", userId, "workouts", String(workoutId))
-    );
-
-    this.workouts = this.workouts.filter((w) => w.id !== workoutId);
-
+   removeSelectedWorkout() {
+    if (this.selectedWorkoutId === null) return;
+    
+    this.workoutToDeleteId = this.selectedWorkoutId;
+    
+    this.workouts = this.workouts.filter((w) => w.id !== this.selectedWorkoutId);
     this.selectedWorkoutId = null;
-    resolvePromise(promise, this.saveWorkoutPromiseState);
-    return promise;
-}
+  }
 };
 
 makeAutoObservable(trainModel);
