@@ -1,4 +1,3 @@
-import { makeAutoObservable } from "mobx";
 import { searchExercises, getExercisesByBodyPart } from "../exerciseSource";
 import { resolvePromise } from "../resolvePromise";
 import { createEmptyWorkout, createWorkoutExerciseFromApi } from "../workout";
@@ -205,4 +204,4 @@ export const trainModel = {
   }
 };
 
-makeAutoObservable(trainModel);
+

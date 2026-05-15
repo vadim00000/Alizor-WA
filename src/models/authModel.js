@@ -1,4 +1,3 @@
-import { makeAutoObservable } from "mobx";
 import { login, signup } from "../firebase/auth";
 
 export const authModel = {
@@ -84,5 +83,3 @@ export const authModel = {
     }
   }
 };
-
-makeAutoObservable(authModel);

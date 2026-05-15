@@ -1,5 +1,3 @@
-import { makeAutoObservable } from "mobx";
-
 export const profileModel = {
   age: null,
   sex: null,
@@ -68,5 +66,3 @@ export const profileModel = {
   }
 
 };
-
-makeAutoObservable(profileModel);

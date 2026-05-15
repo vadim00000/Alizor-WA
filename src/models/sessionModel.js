@@ -1,5 +1,3 @@
-import { makeAutoObservable } from "mobx";
-
 export const sessionModel = {
   user: null,
   authReady: false,
@@ -9,5 +7,3 @@ export const sessionModel = {
     this.authReady = true;
   }
 };
-
-makeAutoObservable(sessionModel);
