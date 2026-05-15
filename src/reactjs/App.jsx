@@ -18,6 +18,7 @@ import { profileModel } from "../models/profileModel";
 import { sessionModel } from "../models/sessionModel";
 import { trainModel } from "../models/trainModel";
 import { Train } from "./trainPresenter.jsx";
+import { StatsProvider } from "./statsContext";
 
 connectAuthSession(sessionModel);
 connectToPersistence(trainModel, sessionModel);
@@ -40,14 +41,16 @@ const App = observer(function App() {
 
   return (
     <BrowserRouter>
-      <NavBar/>
-      <Routes>
-        <Route path="/" element={<HomePresenter model={trainModel}/>}/>
-        <Route path="/stats" element={<StatsView />} />
-        <Route path="/train" element={<Train model={trainModel} />} />
-        <Route path="/records" element={<RecordsView />} />
-        <Route path="/profile" element={<ProfilePresenter model={profileModel} />} />
-      </Routes>
+      <StatsProvider trainModel={trainModel}>
+        <NavBar/>
+        <Routes>
+          <Route path="/" element={<HomePresenter model={trainModel}/>}/>
+          <Route path="/stats" element={<StatsView />} />
+          <Route path="/train" element={<Train model={trainModel} />} />
+          <Route path="/records" element={<RecordsView />} />
+          <Route path="/profile" element={<ProfilePresenter model={profileModel} />} />
+        </Routes>
+      </StatsProvider>
     </BrowserRouter>
   );
 });
