@@ -10,10 +10,10 @@ import { AuthPresenter } from "./authPresenter";
 import { ProfilePresenter } from "./profilePresenter";
 import { Train } from "./trainPresenter.jsx";
 
-import { reactiveTrainModel } from "../mobxReactiveModel.js";
-import { reactiveSessionModel } from "../mobxReactiveModel.js";
-import { reactiveProfileModel } from "../mobxReactiveModel.js";
-import { reactiveAuthModel } from "../mobxReactiveModel.js";
+import { reactiveTrainModel } from "../models/mobxReactiveModel.js";
+import { reactiveSessionModel } from "../models/mobxReactiveModel.js";
+import { reactiveProfileModel } from "../models/mobxReactiveModel.js";
+import { reactiveAuthModel } from "../models/mobxReactiveModel.js";
 
 
 const App = observer(function App() {

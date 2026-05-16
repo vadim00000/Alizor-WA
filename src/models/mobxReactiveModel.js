@@ -1,13 +1,13 @@
 import { observable, configure } from "mobx";
-import { sessionModel } from "./models/sessionModel";
-import { profileModel } from "./models/profileModel";
-import { trainModel } from "./models/trainModel";
-import { authModel } from "./models/authModel";
+import { sessionModel } from "./sessionModel";
+import { profileModel } from "./profileModel";
+import { trainModel } from "./trainModel";
+import { authModel } from "./authModel";
 import {
   connectToPersistence,
   connectProfilePersistence,
   connectAuthPersistence
-} from "./models/firestoreModel";
+} from "./firestoreModel";
 
 configure({ enforceActions: "never" });
 
