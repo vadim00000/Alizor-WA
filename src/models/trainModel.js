@@ -162,13 +162,6 @@ export const trainModel = {
     );
   },
 
-  saveSelectedWorkout() {
-    const workout = this.workouts.find((w) => w.id === this.selectedWorkoutId);
-    if (workout) {
-      this.workoutToSave = { ...workout };
-    }
-  },
-
    removeSelectedWorkout() {
     if (this.selectedWorkoutId === null) return;
     
