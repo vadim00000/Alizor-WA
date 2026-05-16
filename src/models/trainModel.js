@@ -1,12 +1,6 @@
-import { makeAutoObservable } from "mobx";
 import { searchExercises, getExercisesByBodyPart } from "../exerciseSource";
 import { resolvePromise } from "../resolvePromise";
 import { createEmptyWorkout, createWorkoutExerciseFromApi } from "../workout";
-import {
-  deleteWorkout,
-  listWorkouts,
-  putWorkout,
-} from "../persistence/workoutPersistence";
 
 export const trainModel = {
   workouts: [],
@@ -18,6 +12,19 @@ export const trainModel = {
   exercisesPromiseState: {},
   loadWorkoutsPromiseState: {},
   saveWorkoutPromiseState: {},
+
+  workoutToSave: null,  
+  workoutToDeleteId: null,
+
+  setWorkouts(loadedWorkouts) {
+    this.workouts = loadedWorkouts;
+    if (
+      this.selectedWorkoutId != null &&
+      !loadedWorkouts.some((w) => w.id === this.selectedWorkoutId)
+    ) {
+      this.selectedWorkoutId = null;
+    }
+  },
 
   createWorkout(name) {
     if (!name.trim()) return;
@@ -155,62 +162,14 @@ export const trainModel = {
     );
   },
 
-  applyLoadedWorkouts(loaded) {
-    this.workouts = loaded;
-    if (
-      this.selectedWorkoutId != null &&
-      !loaded.some((w) => w.id === this.selectedWorkoutId)
-    ) {
-      this.selectedWorkoutId = null;
-    }
-  },
-
-  loadWorkouts(userId = this.currentUserId) {
-    if (!userId) {
-      this.workouts = [];
-      this.selectedWorkoutId = null;
-      this.loadWorkoutsPromiseState = {};
-      return;
-    }
-
-    const prms = listWorkouts(userId).then((loaded) => {
-      this.applyLoadedWorkouts(loaded);
-      return loaded;
-    });
-
-    resolvePromise(prms, this.loadWorkoutsPromiseState);
-  },
-
-  saveSelectedWorkout(userId = this.currentUserId) {
-    if (!userId || this.selectedWorkoutId === null) return Promise.resolve();
-
-    const workout = this.workouts.find((w) => w.id === this.selectedWorkoutId);
-    if (!workout) return Promise.resolve();
-
-    const payload = {
-      id: workout.id,
-      name: workout.name,
-      exercises: workout.exercises,
-      createdAt: workout.createdAt,
-    };
-
-    const promise = putWorkout(userId, payload);
-    resolvePromise(promise, this.saveWorkoutPromiseState);
-    return promise;
-  },
-
-  removeSelectedWorkout(userId = this.currentUserId) {
-    if (!userId || this.selectedWorkoutId === null) return Promise.resolve();
-
-    const workoutId = this.selectedWorkoutId;
-    const promise = deleteWorkout(userId, workoutId);
-
-    this.workouts = this.workouts.filter((w) => w.id !== workoutId);
-
+   removeSelectedWorkout() {
+    if (this.selectedWorkoutId === null) return;
+    
+    this.workoutToDeleteId = this.selectedWorkoutId;
+    
+    this.workouts = this.workouts.filter((w) => w.id !== this.selectedWorkoutId);
     this.selectedWorkoutId = null;
-    resolvePromise(promise, this.saveWorkoutPromiseState);
-    return promise;
-  },
+  }
 };
 
-makeAutoObservable(trainModel);
+

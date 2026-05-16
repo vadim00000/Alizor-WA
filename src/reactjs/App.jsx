@@ -8,31 +8,24 @@ import StatsView from "../views/statsView";
 import RecordsView from "../views/recordsView";
 import { AuthPresenter } from "./authPresenter";
 import { ProfilePresenter } from "./profilePresenter";
-import { authModel } from "../models/authModel";
-import {
-  connectAuthSession,
-  connectToPersistence,
-  connectProfilePersistence,
-} from "../models/firestoreModel";
-import { profileModel } from "../models/profileModel";
-import { sessionModel } from "../models/sessionModel";
-import { trainModel } from "../models/trainModel";
 import { Train } from "./trainPresenter.jsx";
 
-connectAuthSession(sessionModel);
-connectToPersistence(trainModel, sessionModel);
-connectProfilePersistence(profileModel, sessionModel);
+import { reactiveTrainModel } from "../mobxReactiveModel.js";
+import { reactiveSessionModel } from "../mobxReactiveModel.js";
+import { reactiveProfileModel } from "../mobxReactiveModel.js";
+import { reactiveAuthModel } from "../mobxReactiveModel.js";
+
 
 const App = observer(function App() {
-  if (!sessionModel.authReady) {
+  if (!reactiveSessionModel.authReady) {
     return null;
   }
 
-  if (!sessionModel.user) {
+  if (!reactiveSessionModel.user) {
     return (
       <BrowserRouter>
         <Routes>
-          <Route path="*" element={<AuthPresenter model={authModel} />} />
+          <Route path="*" element={<AuthPresenter model={reactiveAuthModel} />} />
         </Routes>
       </BrowserRouter>
     );
@@ -42,11 +35,11 @@ const App = observer(function App() {
     <BrowserRouter>
       <NavBar/>
       <Routes>
-        <Route path="/" element={<HomePresenter model={trainModel}/>}/>
+        <Route path="/" element={<HomePresenter model={reactiveTrainModel}/>}/>
         <Route path="/stats" element={<StatsView />} />
-        <Route path="/train" element={<Train model={trainModel} />} />
+        <Route path="/train" element={<Train model={reactiveTrainModel} />} />
         <Route path="/records" element={<RecordsView />} />
-        <Route path="/profile" element={<ProfilePresenter model={profileModel} />} />
+        <Route path="/profile" element={<ProfilePresenter model={reactiveProfileModel} />} />
       </Routes>
     </BrowserRouter>
   );
