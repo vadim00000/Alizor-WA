@@ -9,8 +9,10 @@ let trainPersistenceConnected = false;
 let profilePersistenceConnected = false;
 
 /**
- * Connect train model to Firestore lifecycle using MobX reaction.
- * It reloads workouts whenever auth user changes.
+ * Connect train model to Firestore lifecycle using MobX reactions.
+ * Loads templates and sessions on auth change, persists template
+ * saves/deletes and session saves whenever the model exposes a new
+ * intent (templateToSave, templateToDeleteId, sessionToSave).
  */
 export function connectToPersistence(model, sessionModel, watchFunction = reaction) {
   if (trainPersistenceConnected) return;
@@ -20,57 +22,94 @@ export function connectToPersistence(model, sessionModel, watchFunction = reacti
     () => sessionModel.user?.uid ?? null,
     (userId) => {
       model.currentUserId = userId;
-      
+
       if (userId) {
-        const promise = getDocs(collection(db, "users", userId, "workouts")).then((snapshot) => {
+        const templatesPromise = getDocs(
+          collection(db, "users", userId, "templates")
+        ).then((snapshot) => {
           const loaded = snapshot.docs.map((d) => d.data());
-          model.setWorkouts(loaded);
+          model.setTemplates(loaded);
           return loaded;
         });
-        
-        resolvePromise(promise, model.loadWorkoutsPromiseState);
+
+        resolvePromise(templatesPromise, model.loadTemplatesPromiseState);
+
+        const sessionsPromise = getDocs(
+          collection(db, "users", userId, "sessions")
+        ).then((snapshot) => {
+          const loaded = snapshot.docs.map((d) => d.data());
+          model.setSessions(loaded);
+          return loaded;
+        });
+
+        resolvePromise(sessionsPromise, model.loadSessionsPromiseState);
       } else {
-        model.setWorkouts([]);
-        model.loadWorkoutsPromiseState = {};
+        model.setTemplates([]);
+        model.setSessions([]);
+        model.loadTemplatesPromiseState = {};
+        model.loadSessionsPromiseState = {};
       }
     },
     { fireImmediately: true }
   );
 
   watchFunction(
-    () => model.workoutToSave,
-    (workout) => {
+    () => model.templateToSave,
+    (template) => {
       const userId = sessionModel.user?.uid;
-      
-      if (userId && workout) {
-        const promise = setDoc(doc(db, "users", userId, "workouts", String(workout.id)), workout)
-          .then(() => {
-             model.workoutToSave = null; 
-             return workout;
-          });
 
-        resolvePromise(promise, model.saveWorkoutPromiseState);
+      if (userId && template) {
+        const promise = setDoc(
+          doc(db, "users", userId, "templates", String(template.id)),
+          template
+        ).then(() => {
+          model.templateToSave = null;
+          return template;
+        });
+
+        resolvePromise(promise, model.saveTemplatePromiseState);
       }
     }
   );
 
   watchFunction(
-    () => model.workoutToDeleteId,
-    (workoutId) => {
+    () => model.templateToDeleteId,
+    (templateId) => {
       const userId = sessionModel.user?.uid;
-      
-      if (userId && workoutId) {
-        const promise = deleteDoc(doc(db, "users", userId, "workouts", String(workoutId)))
-          .then(() => {
-             model.workoutToDeleteId = null;
-             return workoutId;
-          });
 
-        resolvePromise(promise, model.saveWorkoutPromiseState);
+      if (userId && templateId) {
+        const promise = deleteDoc(
+          doc(db, "users", userId, "templates", String(templateId))
+        ).then(() => {
+          model.templateToDeleteId = null;
+          return templateId;
+        });
+
+        resolvePromise(promise, model.saveTemplatePromiseState);
       }
     }
   );
 
+  watchFunction(
+    () => model.sessionToSave,
+    (session) => {
+      const userId = sessionModel.user?.uid;
+
+      if (userId && session) {
+        const promise = setDoc(
+          doc(db, "users", userId, "sessions", String(session.id)),
+          session
+        ).then(() => {
+          model.sessions = [...model.sessions, session];
+          model.activeSession = null;
+          model.sessionToSave = null;
+          return session;
+        });
+
+        resolvePromise(promise, model.saveSessionPromiseState);
+      }
+    }
+  );
 }
 
 /**
@@ -84,7 +123,7 @@ export function connectProfilePersistence(model, sessionModel, watchFunction = r
     () => sessionModel.user?.uid ?? null,
     (userId) => {
       model.setCurrentUserId(userId);
-      
+
       if (userId) {
         const promise = getDoc(doc(db, "users", userId)).then((snap) => {
           if (snap.exists()) {
@@ -94,7 +133,7 @@ export function connectProfilePersistence(model, sessionModel, watchFunction = r
           }
           return snap;
         });
-        
+
         resolvePromise(promise, model.loadProfilePromiseState);
       } else {
         model.setProfileData(null);

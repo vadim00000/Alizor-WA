@@ -1,79 +1,98 @@
 import { observer } from "mobx-react-lite";
 import { TrainView } from "../views/trainView";
 
-const Train = observer(function TrainRender(props){
-
+const Train = observer(function TrainRender(props) {
     const model = props.model;
 
-    function searchACB(){
+    function searchACB() {
         model.doSearch();
     }
 
-    function selectBodyPartACB(bodyPart){
+    function selectBodyPartACB(bodyPart) {
         model.setBodyPart(bodyPart);
     }
 
-    function addExerciseACB(ex){
-        model.addToWorkout(ex);
+    function createTemplateACB(name) {
+        model.createTemplate(name);
     }
 
-    function removeExerciseACB(ex){
-        model.removeFromWorkout(ex);
+    function selectTemplateACB(id) {
+        model.selectTemplate(id);
     }
 
-    function updateSetACB(ex, setIndex, patch) {
-        model.updateSet(ex, setIndex, patch);
+    function addExerciseACB(ex) {
+        model.addExerciseToTemplate(ex);
     }
 
-    function addSetACB(ex) {
-        model.addSet(ex);
+    function removeExerciseACB(ex) {
+        model.removeExerciseFromTemplate(ex);
     }
 
-    function removeSetACB(ex, setIndex) {
-        model.removeSet(ex, setIndex);
+    function setExerciseSetsACB(exerciseId, count) {
+        model.setExerciseSetsCount(exerciseId, count);
     }
 
-    function createWorkoutACB(name){
-        model.createWorkout(name);
+    function saveTemplateACB() {
+        model.saveSelectedTemplate();
     }
 
-    function selectWorkoutACB(id){
-        model.selectWorkout(id);
+    function removeTemplateACB() {
+        model.removeSelectedTemplate();
     }
 
-    function saveWorkoutACB() {
-        model.saveSelectedWorkout();
+    function startSessionACB() {
+        if (model.selectedTemplateId !== null) {
+            model.startSession(model.selectedTemplateId);
+        }
     }
 
-    function removeWorkoutACB() {
-        model.removeSelectedWorkout();
+    function updateActiveSetACB(exerciseId, setIndex, patch) {
+        model.updateActiveSet(exerciseId, setIndex, patch);
     }
 
-    const selectedWorkout = model.workouts.find(
-        w => w.id === model.selectedWorkoutId
+    function cancelSessionACB() {
+        model.cancelActiveSession();
+    }
+
+    function saveSessionACB() {
+        model.saveActiveSession();
+    }
+
+    const selectedTemplate = model.templates.find(
+        (t) => t.id === model.selectedTemplateId
     );
 
-    const loadState = model.loadWorkoutsPromiseState;
-    const workoutsLoading =
-        !!loadState.promise &&
-        loadState.data === null &&
-        !loadState.error;
+    const loadTemplatesState = model.loadTemplatesPromiseState;
+    const templatesLoading =
+        !!loadTemplatesState.promise &&
+        loadTemplatesState.data === null &&
+        !loadTemplatesState.error;
 
-    const saveState = model.saveWorkoutPromiseState;
-    const saveInProgress =
-        !!saveState.promise &&
-        saveState.data === null &&
-        !saveState.error;
+    const saveTemplateState = model.saveTemplatePromiseState;
+    const templateSaveInProgress =
+        !!saveTemplateState.promise &&
+        saveTemplateState.data === null &&
+        !saveTemplateState.error;
+
+    const saveSessionState = model.saveSessionPromiseState;
+    const sessionSaveInProgress =
+        !!saveSessionState.promise &&
+        saveSessionState.data === null &&
+        !saveSessionState.error;
 
     return (
         <TrainView
-            workouts={model.workouts}
-            selectedWorkoutId={model.selectedWorkoutId}
-            selectedWorkout={selectedWorkout}
-            
-            workoutsLoading={workoutsLoading}
-            saveInProgress={saveInProgress}
-            saveWorkoutError={model.saveWorkoutPromiseState.error}
+            templates={model.templates}
+            selectedTemplateId={model.selectedTemplateId}
+            selectedTemplate={selectedTemplate}
+            templatesLoading={templatesLoading}
+            templateSaveInProgress={templateSaveInProgress}
+            templateSaveError={saveTemplateState.error}
+
+            activeSession={model.activeSession}
+            sessionSaveInProgress={sessionSaveInProgress}
+            sessionSaveError={saveSessionState.error}
+
             searchData={model.searchResultsPromiseState.data}
             searchPromise={model.searchResultsPromiseState.promise}
             searchError={model.searchResultsPromiseState.error}
@@ -81,18 +100,20 @@ const Train = observer(function TrainRender(props){
             exercisesData={model.exercisesPromiseState.data}
             exercisesPromise={model.exercisesPromiseState.promise}
             exercisesError={model.exercisesPromiseState.error}
-            
+
             onSearch={searchACB}
             onSelectBodyPart={selectBodyPartACB}
+            onCreateTemplate={createTemplateACB}
+            onSelectTemplate={selectTemplateACB}
             onAddExercise={addExerciseACB}
             onRemoveExercise={removeExerciseACB}
-            onUpdateSet={updateSetACB}
-            onAddSet={addSetACB}
-            onRemoveSet={removeSetACB}
-            onCreateWorkout={createWorkoutACB}
-            onSelectWorkout={selectWorkoutACB}
-            onSaveWorkout={saveWorkoutACB}
-            onRemoveWorkout={removeWorkoutACB}
+            onSetExerciseSets={setExerciseSetsACB}
+            onSaveTemplate={saveTemplateACB}
+            onRemoveTemplate={removeTemplateACB}
+            onStartSession={startSessionACB}
+            onUpdateActiveSet={updateActiveSetACB}
+            onCancelSession={cancelSessionACB}
+            onSaveSession={saveSessionACB}
         />
     );
 });
