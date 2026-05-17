@@ -1,40 +1,53 @@
+
+
+import { useNavigate } from "react-router-dom";
+
 export default function HomeView(props) {
+  const navigate = useNavigate();
+
   return (
-    <div>
-        <h1>Welcome Alizor</h1>
-        <p>Push your limits.</p>
+    <div className="home-container">
 
-        <div>
-            <h2>This week's recap</h2>
-            <ul>
-                <li><strong>Sessions:</strong> {props.sessionsCount}</li>
-            </ul>
-        </div>
+      <div className="home-hero">
+        <h1 className="home-title">Welcome back, <span>Alizor.</span></h1>
+        <p className="home-sub">Push your limits.</p>
+      </div>
 
-        <hr />
+      <div className="home-stat-card">
+        <p className="home-stat-label">This week</p>
+        <p className="home-stat-number">{String(props.sessionsCount ?? 0)}</p>
+        <p className="home-stat-unit">sessions completed</p>
+      </div>
 
-        <div>
-            <button onClick={props.onToggleHistory}>
-                {props.showHistory ? "Hide" : "Show"} weekly history
-            </button>
+      <div>
+        <button className="home-toggle" onClick={() => navigate("/train")}>Start workout <span className="home-start-plus">+</span></button>
+        <button className="home-toggle" onClick={props.onToggleHistory}>
+          {props.showHistory ? "Hide" : "Show"} history
+          <span className={props.showHistory ? "home-toggle-arrow open" : "home-toggle-arrow"}>⌄</span>
+        </button>
 
-            {props.showHistory && (
-                <div>
-                    {props.recentSessions.length === 0 ? (
-                        <p>No session recorded in the last 7 days.</p>
-                    ) : (
-                        <ul>
-                            {props.recentSessions.map((session) => (
-                                <li key={session.id}>
-                                    {session.templateName} —{" "}
-                                    {new Date(session.performedAt).toLocaleDateString()}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
+
+        {props.showHistory && (
+          <ul className="home-list">
+            {props.recentSessions.length === 0 ? (
+              <p className="home-empty">No sessions in the last 7 days.</p>
+            ) : (
+              props.recentSessions.map((session, i) => (
+                <li key={session.id}>
+                  <span className="home-list-index">{String(i + 1)}</span>
+                  <span className="home-list-name">{session.templateName}</span>
+                  <span className="home-list-date">
+                    {new Date(session.performedAt).toLocaleDateString("fr-FR", {
+                      day: "numeric", month: "short"
+                    })}
+                  </span>
+                </li>
+              ))
             )}
-        </div>
+          </ul>
+        )}
+      </div>
+
     </div>
   );
 }

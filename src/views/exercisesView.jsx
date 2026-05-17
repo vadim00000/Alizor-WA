@@ -3,13 +3,13 @@ export function ExercisesView({ exercises, onAddExercise }) {
         <div>
             <h3>Available Exercises</h3>
 
-            <ul>
+            <ul className="exercises-list">
                 {exercises.map(ex => (
                     <li key={ex.id}>
-                        <div>{ex.name}</div>
+                        <div className="exercise-name">{ex.name}</div>
 
                         {ex.gifUrl && (
-                            <img src={ex.gifUrl} width="100" alt={ex.name}/>
+                            <img src={ex.gifUrl} alt={ex.name} className="exercise-gif"/>
                         )}
 
                         <button
