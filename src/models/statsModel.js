@@ -44,29 +44,7 @@ export const statsModel = {
     return Promise.resolve();
   },
 
-  saveStats(userId) {
-    console.info('statsModel.saveStats called for user', userId);
-    if (!userId) return Promise.reject(new Error('no userId'));
-
-    const statsData = {
-      sessions: this.sessions,
-      monthlyData: this.monthlyData,
-      totalVolume: this.totalVolume,
-      comparison: this.comparison,
-      totalSessions: this.totalSessions,
-      avgPerWeek: this.avgPerWeek,
-      totalTime: this.totalTime,
-      bestStreak: this.bestStreak,
-      prs: this.prs,
-      musclePercentages: this.musclePercentages,
-      lastModifiedAt: serverTimestamp(),
-    };
-
-    const promise = setDoc(doc(db, 'users', userId, 'stats', 'summary'), statsData, { merge: true })
-      .then(() => statsData);
-
-    return promise;
-  },
+  // persistence for stats is handled by src/models/firestoreModel.js
 };
 
 makeAutoObservable(statsModel);

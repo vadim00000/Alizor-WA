@@ -224,7 +224,32 @@ export function connectStatsPersistence(statsModel, sessionModel, watchFunction 
     () => {
       const uid = sessionModel.user?.uid;
       if (!uid) return;
-      try { statsModel.saveStats(uid); } catch (e) { console.warn('statsModel.saveStats failed', e); }
+      try {
+        const statsData = {
+          sessions: statsModel.sessions,
+          monthlyData: statsModel.monthlyData,
+          totalVolume: statsModel.totalVolume,
+          comparison: statsModel.comparison,
+          totalSessions: statsModel.totalSessions,
+          avgPerWeek: statsModel.avgPerWeek,
+          totalTime: statsModel.totalTime,
+          bestStreak: statsModel.bestStreak,
+          prs: statsModel.prs,
+          musclePercentages: statsModel.musclePercentages,
+          lastModifiedAt: serverTimestamp(),
+        };
+
+        const promise = setDoc(doc(db, 'users', uid, 'stats', 'summary'), statsData, { merge: true })
+          .then(() => {
+            // return the saved payload for consistency with resolvePromise handlers
+            return statsData;
+          });
+
+        // expose a promise state on the model similarly to templates/sessions
+        resolvePromise(promise, statsModel.saveStatsPromiseState);
+      } catch (e) { console.warn('saveStats failed', e); }
     }
   );
 }
+
+// stats persistence is performed inline inside connectStatsPersistence using setDoc

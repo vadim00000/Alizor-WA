@@ -1,10 +1,16 @@
-import { useState } from 'react';
 import WeightChart from './WeightChart';
+import '../css/stats.css';
 
 export default function StatsView(props) {
-    const [active, setActive] = useState('overview');
-    const [selectedExercise, setSelectedExercise] = useState(null);
-    const [selectedExerciseSeries, setSelectedExerciseSeries] = useState([]);
+    // Fully prop-driven: component reads values from props (with sensible defaults)
+    // and invokes callbacks to request changes. No internal useState is used here.
+    const active = props.activeTab ?? 'overview';
+    const selectedExercise = props.selectedExercise ?? null;
+    const selectedExerciseSeries = props.selectedExerciseSeries ?? [];
+
+    const setActive = (v) => { if (typeof props.onActiveTabChange === 'function') props.onActiveTabChange(v); };
+    const setSelectedExercise = (v) => { if (typeof props.onSelectedExerciseChange === 'function') props.onSelectedExerciseChange(v); };
+    const setSelectedExerciseSeries = (v) => { if (typeof props.onSelectedExerciseSeriesChange === 'function') props.onSelectedExerciseSeriesChange(v); };
 
     const renderOverview = () => {
         const stats = props.stats || [];
@@ -21,7 +27,6 @@ export default function StatsView(props) {
                     <div style={{ marginTop: '1rem' }}>
                         <h3 style={{ margin: '0 0 0.25rem 0' }}>Weight history</h3>
                         <WeightChart points={props.weightPoints} height={260} />
-                        {/* Inline SVG WeightGraph is still available below as WeightGraph (fallback) */}
                     </div>
                 )}
             </div>
@@ -84,13 +89,24 @@ export default function StatsView(props) {
     };
 
     return (
-        <div>
+        <div className="stats-container">
             <h1>Stats</h1>
-            <p>Total sessions logged: {props.totalSessions}</p>
+            <p style={{ marginTop: 8 }}>Total sessions logged: {props.totalSessions}</p>
 
             <div className="stats-actions">
                 <button className={`tab-btn overview ${active === 'overview' ? 'active' : ''}`} onClick={() => setActive('overview')}>Overview</button>
-                <button className={`tab-btn details ${active === 'details' ? 'active' : ''}`} onClick={() => { setActive('details'); setSelectedExercise(null); }}>Details</button>
+                <button className={`tab-btn details ${active === 'details' ? 'active' : ''}`} onClick={() => {
+                    setActive('details');
+                    // auto-select first exercise if available
+                    const exKeys = Object.keys(props.exerciseSeries || {});
+                    if (exKeys.length > 0) {
+                        setSelectedExercise(exKeys[0]);
+                        setSelectedExerciseSeries(props.exerciseSeries[exKeys[0]] || []);
+                    } else {
+                        setSelectedExercise(null);
+                        setSelectedExerciseSeries([]);
+                    }
+                }}>Details</button>
                 <button className={`tab-btn muscles ${active === 'muscles' ? 'active' : ''}`} onClick={() => setActive('muscles')}>Muscles</button>
                 <button className={`tab-btn prs ${active === 'prs' ? 'active' : ''}`} onClick={() => setActive('prs')}>PRs</button>
             </div>
@@ -109,9 +125,9 @@ export default function StatsView(props) {
                             <div style={{ marginTop: '1rem' }}>
                                 <h4 style={{ margin: '0 0 0.5rem 0' }}>{selectedExercise}</h4>
                                 {Array.isArray(selectedExerciseSeries) && selectedExerciseSeries.length > 0 ? (
-                                    <WeightChart points={selectedExerciseSeries} height={260} />
+                                    <div className="chart-wrapper"><WeightChart points={selectedExerciseSeries} height={260} /></div>
                                 ) : (
-                                    <p style={{ color: '#666' }}>No data for this exercise yet.</p>
+                                    <p className="stats-empty">No data for this exercise yet.</p>
                                 )}
                                 <div style={{ marginTop: '0.5rem' }}>
                                     <button onClick={() => { setSelectedExercise(null); setSelectedExerciseSeries([]); }}>Back</button>
@@ -141,71 +157,10 @@ function renderDetailsForExercises(exerciseSeries, setSelectedExercise, setSelec
                 ))}
             </div>
             <div>
-                <p style={{ color: '#666' }}>Clique sur un exercice pour afficher son graphe</p>
+                <p style={{ color: '#666' }}>Click on an exercise to see its weight progression over time.</p>
             </div>
         </div>
     );
 }
 
-function renderDetails() {
-    // `props` is not available here, so this function will be bound from inside the component where needed.
-    return null;
-}
 
-function WeightGraph({ points, width = 720, height = 220 }) {
-    const pad = 10;
-  const innerW = Math.max(10, width - pad * 2);
-  const innerH = Math.max(10, height - pad * 2);
-    const xs = points.map(p => p.x.getTime());
-    const ys = points.map(p => p.y);
-    const minX = Math.min(...xs);
-    const maxX = Math.max(...xs);
-    // fixed y domain 0..150 as requested
-    const minY = 0;
-    const maxY = 150;
-
-  const xScale = (t) => {
-    if (minX === maxX) return pad + innerW / 2;
-    return pad + ((t - minX) / (maxX - minX)) * innerW;
-  };
-  const yScale = (v) => {
-        // clamp value into domain then scale
-        const vv = Math.max(minY, Math.min(maxY, v));
-        return pad + innerH - ((vv - minY) / (maxY - minY)) * innerH;
-  };
-
-  const pathD = points.map((p, i) => {
-    const x = xScale(p.x.getTime());
-    const y = yScale(p.y);
-    return `${i === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
-  }).join(' ');
-
-    return (
-        <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ border: '1px solid #eee', background: '#fff' }}>
-            <rect x={0} y={0} width={width} height={height} fill="#fff" />
-            {/* subtle shadow stroke for depth */}
-            <path d={pathD} fill="none" stroke="rgba(25,118,210,0.12)" strokeWidth={6} strokeLinejoin="round" strokeLinecap="round" />
-            <path d={pathD} fill="none" stroke="#1976d2" strokeWidth={3} strokeLinejoin="round" strokeLinecap="round" />
-            {points.map((p, i) => (
-                <g key={i}>
-                                        {/* point shadow */}
-                                        <circle cx={xScale(p.x.getTime())} cy={yScale(p.y)} r={6} fill="rgba(0,0,0,0.06)" />
-                                        <circle cx={xScale(p.x.getTime())} cy={yScale(p.y)} r={5} fill="#1976d2" stroke="#fff" strokeWidth={0.8} />
-                                        {/* value label just above the point */}
-                                        <text x={xScale(p.x.getTime())} y={Math.max(10, yScale(p.y) - 12)} fontSize={12} fill="#222" fontWeight={700} textAnchor="middle">{Number(p.y).toFixed(1)} kg</text>
-                                        {/* x-axis label: show only the date (day/month) */}
-                                        <text x={xScale(p.x.getTime())} y={height - 8} fontSize={11} fill="#666" textAnchor="middle">{formatDateLabel(p.x)}</text>
-                </g>
-            ))}
-            {/* y-axis labels fixed at 0 and 150 */}
-                        <text x={8} y={pad + 14} fontSize={12} fill="#666">150 kg</text>
-                        <text x={8} y={height - 8} fontSize={12} fill="#666">0 kg</text>
-    </svg>
-  );
-}
-
-function formatDateLabel(d) {
-    if (!(d instanceof Date)) d = new Date(d);
-    const pad2 = (n) => String(n).padStart(2, '0');
-    return `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}`;
-}
