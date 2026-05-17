@@ -16,6 +16,8 @@ export const statsModel = {
   bestStreak: 0,
   prs: [],
   musclePercentages: {},
+  // promise state holder used by firestore persistence to surface save status
+  saveStatsPromiseState: {},
 
   // called by presenter to add a session
   addSession(session) {
