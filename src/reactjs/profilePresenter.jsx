@@ -37,7 +37,7 @@ const ProfilePresenter = observer(function ProfilePresenterRender(props) {
   }
 
   function saveACB() {
-    model.saveProfile();
+    model.setSave();
   }
 
   return (

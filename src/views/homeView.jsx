@@ -1,4 +1,3 @@
-// src/views/homeView.jsx
 export default function HomeView(props) {
   return (
     <div>
@@ -8,7 +7,7 @@ export default function HomeView(props) {
         <div>
             <h2>This week's recap</h2>
             <ul>
-                <li><strong>Sessions:</strong> {props.workoutsCount}</li>
+                <li><strong>Sessions:</strong> {props.sessionsCount}</li>
             </ul>
         </div>
 
@@ -21,13 +20,14 @@ export default function HomeView(props) {
 
             {props.showHistory && (
                 <div>
-                    {props.recentWorkouts.length === 0 ? (
-                        <p>No workouts recorded in the last 7 days.</p>
+                    {props.recentSessions.length === 0 ? (
+                        <p>No session recorded in the last 7 days.</p>
                     ) : (
                         <ul>
-                            {props.recentWorkouts.map(session => (
+                            {props.recentSessions.map((session) => (
                                 <li key={session.id}>
-                                    {new Date(session.createdAt).toLocaleDateString()}
+                                    {session.templateName} —{" "}
+                                    {new Date(session.performedAt).toLocaleDateString()}
                                 </li>
                             ))}
                         </ul>

@@ -1,10 +1,3 @@
-import { makeAutoObservable } from "mobx";
-import { resolvePromise } from "../resolvePromise";
-import {
-  fetchUserProfile,
-  saveUserProfile,
-} from "../persistence/profilePersistence";
-
 export const profileModel = {
   age: null,
   sex: null,
@@ -15,30 +8,18 @@ export const profileModel = {
   loadProfilePromiseState: {},
   saveProfilePromiseState: {},
 
-  setAge(value) {
-    this.age = value;
-  },
-
-  setSex(value) {
-    this.sex = value;
-  },
-
-  setWeightKg(value) {
-    this.weightKg = value;
-  },
-
-  setTargetWeightKg(value) {
-    this.targetWeightKg = value;
-  },
+  setToSave: false,
 
   _resetFields() {
     this.age = null;
     this.sex = null;
     this.weightKg = null;
     this.targetWeightKg = null;
+    this.setToSave = false;
+    this.loadProfilePromiseState = {};
   },
 
-  applyProfileData(data) {
+  setProfileData(data) {
     if (data) {
       this.age = data.age ?? null;
       this.sex = data.sex ?? null;
@@ -49,36 +30,31 @@ export const profileModel = {
     }
   },
 
-  loadProfile(userId = this.currentUserId) {
+  setAge(age) {
+    this.age = age;
+  },
+
+  setSex(sex) {
+    this .sex = sex;
+  },
+
+  setWeightKg(weightKg) {
+    this.weightKg = weightKg;
+  },
+
+  setTargetWeightKg(targetWeightKg) {
+    this.targetWeightKg = targetWeightKg;
+  },
+
+  setSave() {
+    this.setToSave = true;
+  },
+
+  setCurrentUserId(userId) {
     this.currentUserId = userId ?? null;
     if (!userId) {
       this._resetFields();
-      this.loadProfilePromiseState = {};
-      return;
     }
+  }
 
-    const prms = fetchUserProfile(userId).then((data) => {
-      this.applyProfileData(data);
-      return data;
-    });
-
-    resolvePromise(prms, this.loadProfilePromiseState);
-  },
-
-  saveProfile(userId = this.currentUserId) {
-    if (!userId) return Promise.resolve();
-
-    const payload = {
-      age: this.age,
-      sex: this.sex,
-      weightKg: this.weightKg,
-      targetWeightKg: this.targetWeightKg,
-    };
-
-    const promise = saveUserProfile(userId, payload);
-    resolvePromise(promise, this.saveProfilePromiseState);
-    return promise;
-  },
 };
-
-makeAutoObservable(profileModel);

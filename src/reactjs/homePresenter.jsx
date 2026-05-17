@@ -1,18 +1,17 @@
 import { observer } from "mobx-react-lite";
-import HomeView from "../views/homeView";
-import { getWeeklyStats } from "../utilities";
 import { useState } from "react";
-
+import HomeView from "../views/homeView";
+import { getWeeklySessionCount } from "../utilities";
 
 export default observer(function HomePresenter(props) {
-    const workoutsCount = getWeeklyStats(props.model.workouts);
+    const sessionsCount = getWeeklySessionCount(props.model.sessions);
     const [isOpen, setIsOpen] = useState(false);
-    const recentWorkouts = props.model.getWeekWorkouts();
+    const recentSessions = props.model.getWeekSessions();
 
     return (
-        <HomeView 
-            workoutsCount={workoutsCount}
-            recentWorkouts={recentWorkouts}
+        <HomeView
+            sessionsCount={sessionsCount}
+            recentSessions={recentSessions}
             showHistory={isOpen}
             onToggleHistory={() => setIsOpen(!isOpen)}
         />
