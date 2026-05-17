@@ -9,7 +9,6 @@ import RecordsView from "../views/recordsView";
 import { AuthPresenter } from "./authPresenter";
 import { ProfilePresenter } from "./profilePresenter";
 import { Train } from "./trainPresenter.jsx";
-import { StatsProvider } from "./statsContext";
 
 import { reactiveTrainModel } from "../models/mobxReactiveModel.js";
 import { reactiveSessionModel } from "../models/mobxReactiveModel.js";
@@ -37,7 +36,7 @@ const App = observer(function App() {
       <NavBar/>
       <Routes>
         <Route path="/" element={<HomePresenter model={reactiveTrainModel}/>}/>
-        <Route path="/stats" element={<StatsPresenter model={reactiveTrainModel} />} />
+  <Route path="/stats" element={<StatsPresenter model={reactiveTrainModel} profileModel={reactiveProfileModel} />} />
         <Route path="/train" element={<Train model={reactiveTrainModel} />} />
         <Route path="/records" element={<RecordsView />} />
         <Route path="/profile" element={<ProfilePresenter model={reactiveProfileModel} />} />

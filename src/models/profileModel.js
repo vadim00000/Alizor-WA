@@ -3,6 +3,8 @@ export const profileModel = {
   sex: null,
   weightKg: null,
   targetWeightKg: null,
+  // array of { ts: number, weightKg: number }
+  weightHistory: [],
   currentUserId: null,
 
   loadProfilePromiseState: {},
@@ -15,6 +17,7 @@ export const profileModel = {
     this.sex = null;
     this.weightKg = null;
     this.targetWeightKg = null;
+    this.weightHistory = [];
     this.setToSave = false;
     this.loadProfilePromiseState = {};
   },
@@ -25,6 +28,7 @@ export const profileModel = {
       this.sex = data.sex ?? null;
       this.weightKg = data.weightKg ?? null;
       this.targetWeightKg = data.targetWeightKg ?? null;
+      this.weightHistory = Array.isArray(data.weightHistory) ? data.weightHistory.slice() : [];
     } else {
       this._resetFields();
     }

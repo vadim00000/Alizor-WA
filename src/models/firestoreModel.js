@@ -1,5 +1,5 @@
 import { reaction } from "mobx";
-import { doc, getDoc, setDoc, deleteDoc, collection, getDocs} from "firebase/firestore";
+import { doc, getDoc, setDoc, deleteDoc, collection, getDocs, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { resolvePromise } from "../resolvePromise";
 import { onAuthStateChanged } from "firebase/auth";
@@ -52,21 +52,15 @@ export function connectToPersistence(model, sessionModel, watchFunction = reacti
     },
     { fireImmediately: true }
   );
-
   watchFunction(
     () => model.templateToSave,
     (template) => {
       const userId = sessionModel.user?.uid;
-
       if (userId && template) {
-        const promise = setDoc(
-          doc(db, "users", userId, "templates", String(template.id)),
-          template
-        ).then(() => {
+        const promise = setDoc(doc(db, "users", userId, "templates", String(template.id)), template).then(() => {
           model.templateToSave = null;
           return template;
         });
-
         resolvePromise(promise, model.saveTemplatePromiseState);
       }
     }
@@ -76,15 +70,11 @@ export function connectToPersistence(model, sessionModel, watchFunction = reacti
     () => model.templateToDeleteId,
     (templateId) => {
       const userId = sessionModel.user?.uid;
-
       if (userId && templateId) {
-        const promise = deleteDoc(
-          doc(db, "users", userId, "templates", String(templateId))
-        ).then(() => {
+        const promise = deleteDoc(doc(db, "users", userId, "templates", String(templateId))).then(() => {
           model.templateToDeleteId = null;
           return templateId;
         });
-
         resolvePromise(promise, model.saveTemplatePromiseState);
       }
     }
@@ -94,27 +84,19 @@ export function connectToPersistence(model, sessionModel, watchFunction = reacti
     () => model.sessionToSave,
     (session) => {
       const userId = sessionModel.user?.uid;
-
       if (userId && session) {
-        const promise = setDoc(
-          doc(db, "users", userId, "sessions", String(session.id)),
-          session
-        ).then(() => {
+        const promise = setDoc(doc(db, "users", userId, "sessions", String(session.id)), session).then(() => {
           model.sessions = [...model.sessions, session];
           model.activeSession = null;
           model.sessionToSave = null;
           return session;
         });
-
         resolvePromise(promise, model.saveSessionPromiseState);
       }
     }
   );
 }
 
-/**
- * Load user profile document when auth user changes.
- */
 export function connectProfilePersistence(model, sessionModel, watchFunction = reaction) {
   if (profilePersistenceConnected) return;
   profilePersistenceConnected = true;
@@ -127,9 +109,9 @@ export function connectProfilePersistence(model, sessionModel, watchFunction = r
       if (userId) {
         const promise = getDoc(doc(db, "users", userId)).then((snap) => {
           if (snap.exists()) {
-             model.setProfileData(snap.data());
+            model.setProfileData(snap.data());
           } else {
-             model.setProfileData(null);
+            model.setProfileData(null);
           }
           return snap;
         });
@@ -147,6 +129,53 @@ export function connectProfilePersistence(model, sessionModel, watchFunction = r
     (shouldSave) => {
       const userId = sessionModel.user?.uid;
       if (userId && shouldSave) {
+
+        // Append/update weight history per-minute: if the last entry has the same
+        // minute (YYYY-MM-DD HH:MM) then replace it, otherwise append a new entry.
+        try {
+          const hist = Array.isArray(model.weightHistory) ? model.weightHistory.slice() : [];
+          const now = new Date();
+          const last = hist.length ? hist[hist.length - 1] : null;
+          const sameMinute = last && (() => {
+            try {
+              const lastDate = new Date(Number(last.ts));
+              return lastDate.getFullYear() === now.getFullYear() && lastDate.getMonth() === now.getMonth() && lastDate.getDate() === now.getDate() && lastDate.getHours() === now.getHours() && lastDate.getMinutes() === now.getMinutes();
+            } catch (e) { return false; }
+          })();
+
+          if (model.weightKg != null) {
+            const point = { ts: now.getTime(), weightKg: Number(model.weightKg) };
+            if (sameMinute) {
+              hist[hist.length - 1] = point;
+            } else {
+              hist.push(point);
+            }
+          }
+
+          model.weightHistory = hist;
+
+          const profileData = {
+            age: model.age,
+            sex: model.sex,
+            weightKg: model.weightKg,
+            targetWeightKg: model.targetWeightKg,
+            weightHistory: model.weightHistory,
+            lastModifiedAt: serverTimestamp(),
+          };
+
+          const promise = setDoc(doc(db, "users", userId), profileData, { merge: true })
+            .then(() => {
+              model.setToSave = false;
+              return profileData;
+            });
+
+          resolvePromise(promise, model.saveProfilePromiseState);
+          return;
+        } catch (e) {
+          // fall back to naive save if anything fails
+          console.warn('weightHistory append failed', e);
+        }
+
         const profileData = {
           age: model.age,
           sex: model.sex,

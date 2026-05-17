@@ -1,4 +1,6 @@
 import { makeAutoObservable } from 'mobx';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase/config';
 
 // Simple MobX model for stats. Presenter will modify this model; persistence
 // is handled in src/models/firestoreModel.js via a watch function.
@@ -44,7 +46,26 @@ export const statsModel = {
 
   saveStats(userId) {
     console.info('statsModel.saveStats called for user', userId);
-    return Promise.resolve();
+    if (!userId) return Promise.reject(new Error('no userId'));
+
+    const statsData = {
+      sessions: this.sessions,
+      monthlyData: this.monthlyData,
+      totalVolume: this.totalVolume,
+      comparison: this.comparison,
+      totalSessions: this.totalSessions,
+      avgPerWeek: this.avgPerWeek,
+      totalTime: this.totalTime,
+      bestStreak: this.bestStreak,
+      prs: this.prs,
+      musclePercentages: this.musclePercentages,
+      lastModifiedAt: serverTimestamp(),
+    };
+
+    const promise = setDoc(doc(db, 'users', userId, 'stats', 'summary'), statsData, { merge: true })
+      .then(() => statsData);
+
+    return promise;
   },
 };
 
