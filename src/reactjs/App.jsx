@@ -17,12 +17,15 @@ import {
 import { profileModel } from "../models/profileModel";
 import { sessionModel } from "../models/sessionModel";
 import { trainModel } from "../models/trainModel";
+import statsModel from "../models/statsModel";
+import { connectStatsPersistence } from "../models/firestoreModel";
 import { Train } from "./trainPresenter.jsx";
 import { StatsProvider } from "./statsContext";
 
 connectAuthSession(sessionModel);
 connectToPersistence(trainModel, sessionModel);
 connectProfilePersistence(profileModel, sessionModel);
+connectStatsPersistence(statsModel, sessionModel);
 
 const App = observer(function App() {
   if (!sessionModel.authReady) {
@@ -44,7 +47,7 @@ const App = observer(function App() {
         <NavBar/>
         <Routes>
           <Route path="/" element={<HomePresenter model={trainModel}/>}/>
-          <Route path="/stats" element={<StatsPresenter trainModel={trainModel}/>} />
+            <Route path="/stats" element={<StatsPresenter trainModel={trainModel} statsModel={statsModel} />} />
           <Route path="/train" element={<Train model={trainModel} />} />
           <Route path="/records" element={<RecordsView />} />
           <Route path="/profile" element={<ProfilePresenter model={profileModel} />} />

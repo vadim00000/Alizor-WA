@@ -40,3 +40,31 @@ export function connectProfilePersistence(model, sessionModel, watchFunction = r
     { fireImmediately: true }
   );
 }
+
+export function connectStatsPersistence(statsModel, sessionModel, watchFunction = reaction) {
+  // Keep idempotent
+  if (!statsModel || !sessionModel) return;
+
+  // Watch for user changes and load stats for user
+  watchFunction(
+    () => sessionModel.user?.uid ?? null,
+    (userId) => {
+      statsModel.currentUserId = userId;
+      if (userId) {
+        // delegate loading to the model (which may call persistence layer)
+        try { statsModel.loadStats(userId); } catch (e) { console.warn('statsModel.loadStats failed', e); }
+      }
+    },
+    { fireImmediately: true }
+  );
+
+  // Watch for changes in statsModel and persist them
+  watchFunction(
+    () => [statsModel.sessions.length, statsModel.totalVolume, JSON.stringify(statsModel.musclePercentages)],
+    () => {
+      const uid = sessionModel.user?.uid;
+      if (!uid) return;
+      try { statsModel.saveStats(uid); } catch (e) { console.warn('statsModel.saveStats failed', e); }
+    }
+  );
+}
