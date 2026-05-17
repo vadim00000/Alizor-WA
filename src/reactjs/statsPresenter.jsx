@@ -37,9 +37,21 @@ function computeMuscleCounts(sessions = [], options = { all: false }) {
 }
 
 function buildTemplateStats(templates, sessions) {
+    // normalize templates into an array: accept arrays, iterable objects, or plain objects
+    let templateList = [];
+    if (Array.isArray(templates)) {
+        templateList = templates;
+    } else if (templates && typeof templates[Symbol.iterator] === 'function') {
+        templateList = Array.from(templates);
+    } else if (templates && typeof templates === 'object') {
+        templateList = Object.values(templates);
+    } else {
+        templateList = [];
+    }
+
     const countsByTemplateId = new Map();
 
-    for (const t of templates) {
+    for (const t of templateList) {
         countsByTemplateId.set(t.id, {
             templateId: t.id,
             templateName: t.name,
@@ -68,9 +80,14 @@ function buildTemplateStats(templates, sessions) {
 }
 
 const StatsPresenter = observer(function StatsPresenter(props) {
+    // props.trainModel contains templates/sessions (data)
+    // props.statsModel contains UI state and saved stats
+    const trainModel = props.trainModel || {};
+    const statsModel = props.statsModel || {};
+
     // compute only with sessions whose template still exists (non-deleted)
-    const templates = props.model.templates || [];
-    const sessions = props.model.sessions || [];
+    const templates = Array.isArray(trainModel.templates) ? trainModel.templates : [];
+    const sessions = Array.isArray(trainModel.sessions) ? trainModel.sessions : [];
     const existingTemplateIds = new Set(templates.map(t => String(t.id)));
 
     // If templates haven't loaded yet (empty) but sessions exist, don't filter to avoid transient zeros
@@ -84,7 +101,7 @@ const StatsPresenter = observer(function StatsPresenter(props) {
     // (debug logs removed)
 
     const stats = buildTemplateStats(
-        props.model.templates,
+        templates,
         sessionsNonDeleted
     );
 
@@ -108,7 +125,7 @@ const StatsPresenter = observer(function StatsPresenter(props) {
     }, 0);
 
     const overviewText = `Overview: ${totalSessions} sessions, total volume ${totalVolume}`;
-    const prsText = `PRs: ${Array.isArray(props.model.prs) ? props.model.prs.length : 0} records`;
+    const prsText = `PRs: ${Array.isArray(statsModel.prs) ? statsModel.prs.length : 0} records`;
 
     // compute muscle counts for the same non-deleted session set
     const muscleCounts = computeMuscleCounts(sessionsNonDeleted);
@@ -182,7 +199,24 @@ const StatsPresenter = observer(function StatsPresenter(props) {
         exerciseSeries[name] = arr.sort((a,b) => a.x - b.x);
     });
 
-    return <StatsView stats={stats} totalSessions={totalSessions} overviewText={overviewText} muscleCounts={muscleCounts} prsText={prsTextUpdated} prs={prs} weightPoints={weightPoints} exerciseSeries={exerciseSeries} />;
+    return <StatsView
+        stats={stats}
+        totalSessions={totalSessions}
+        overviewText={overviewText}
+        muscleCounts={muscleCounts}
+        prsText={prsTextUpdated}
+        prs={prs}
+        weightPoints={weightPoints}
+        exerciseSeries={exerciseSeries}
+        // UI state from statsModel
+        activeTab={statsModel.uiActiveTab}
+        selectedExercise={statsModel.uiSelectedExercise}
+        selectedExerciseSeries={statsModel.uiSelectedExerciseSeries}
+        // callbacks to update statsModel UI state
+        onActiveTabChange={(tab) => statsModel.setUiActiveTab && statsModel.setUiActiveTab(tab)}
+        onSelectedExerciseChange={(ex) => statsModel.setUiSelectedExercise && statsModel.setUiSelectedExercise(ex)}
+        onSelectedExerciseSeriesChange={(s) => statsModel.setUiSelectedExerciseSeries && statsModel.setUiSelectedExerciseSeries(s)}
+    />;
 });
 
 export { StatsPresenter };

@@ -211,8 +211,38 @@ export function connectStatsPersistence(statsModel, sessionModel, watchFunction 
     (userId) => {
       statsModel.currentUserId = userId;
       if (userId) {
-        // delegate loading to the model (which may call persistence layer)
-        try { statsModel.loadStats(userId); } catch (e) { console.warn('statsModel.loadStats failed', e); }
+        try {
+          const promise = getDoc(doc(db, 'users', userId, 'stats', 'summary')).then((snap) => {
+            if (snap.exists()) {
+              const data = snap.data() || {};
+              statsModel.sessions = Array.isArray(data.sessions) ? data.sessions : [];
+              statsModel.monthlyData = data.monthlyData || [];
+              statsModel.totalVolume = data.totalVolume || 0;
+              statsModel.comparison = data.comparison || 0;
+              statsModel.totalSessions = data.totalSessions || statsModel.sessions.length;
+              statsModel.avgPerWeek = data.avgPerWeek || 0;
+              statsModel.totalTime = data.totalTime || 0;
+              statsModel.bestStreak = data.bestStreak || 0;
+              statsModel.prs = Array.isArray(data.prs) ? data.prs : [];
+              statsModel.musclePercentages = data.musclePercentages || {};
+            } else {
+              // reset to defaults
+              statsModel.sessions = [];
+              statsModel.monthlyData = [];
+              statsModel.totalVolume = 0;
+              statsModel.comparison = 0;
+              statsModel.totalSessions = 0;
+              statsModel.avgPerWeek = 0;
+              statsModel.totalTime = 0;
+              statsModel.bestStreak = 0;
+              statsModel.prs = [];
+              statsModel.musclePercentages = {};
+            }
+            return snap;
+          });
+
+          resolvePromise(promise, statsModel.loadStatsPromiseState);
+        } catch (e) { console.warn('statsModel.loadStats failed', e); }
       }
     },
     { fireImmediately: true }

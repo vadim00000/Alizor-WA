@@ -18,6 +18,7 @@ import { reactiveTrainModel } from "../models/mobxReactiveModel.js";
 import { reactiveSessionModel } from "../models/mobxReactiveModel.js";
 import { reactiveProfileModel } from "../models/mobxReactiveModel.js";
 import { reactiveAuthModel } from "../models/mobxReactiveModel.js";
+import { reactiveStatsModel } from "../models/mobxReactiveModel.js";
 
 
 const App = observer(function App() {
@@ -40,7 +41,7 @@ const App = observer(function App() {
       <NavBar/>
       <Routes>
         <Route path="/" element={<HomePresenter model={reactiveTrainModel}/>}/>
-  <Route path="/stats" element={<StatsPresenter model={reactiveTrainModel} profileModel={reactiveProfileModel} />} />
+  <Route path="/stats" element={<StatsPresenter trainModel={reactiveTrainModel} statsModel={reactiveStatsModel} profileModel={reactiveProfileModel} />} />
         <Route path="/train" element={<Train model={reactiveTrainModel} />} />
         <Route path="/records" element={<RecordsView />} />
         <Route path="/profile" element={<ProfilePresenter model={reactiveProfileModel} />} />
