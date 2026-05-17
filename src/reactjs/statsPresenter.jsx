@@ -19,16 +19,28 @@ function computeMuscleCounts(sessions = [], options = { all: false }) {
         } else if (Array.isArray(s.exercises)) {
             s.exercises.forEach(ex => {
                 const bodyPart = String(ex.bodyPart || '').toLowerCase();
-                if (bodyPart.includes('chest')) musclesInSession.add('Chest');
-                if (bodyPart.includes('back')) musclesInSession.add('Back');
-                if (bodyPart.includes('shoulder')) musclesInSession.add('Shoulders');
-                // map upper/lower arms and arm-related parts to Arms
-                if (bodyPart.includes('arm') || bodyPart.includes('upper arms') || bodyPart.includes('lower arms') || bodyPart.includes('biceps') || bodyPart.includes('triceps')) musclesInSession.add('Arms');
-                if (bodyPart.includes('upper legs') || bodyPart.includes('lower legs') || bodyPart.includes('quads') || bodyPart.includes('hamstring') || bodyPart.includes('calf')) musclesInSession.add('Legs');
-                if (bodyPart.includes('waist') || bodyPart.includes('core') || bodyPart.includes('abs')) musclesInSession.add('Waist');
-                if (bodyPart.includes('glute') || bodyPart.includes('butt')) musclesInSession.add('Glutes');
-                if (bodyPart.includes('neck')) musclesInSession.add('Neck');
-                if (bodyPart.includes('cardio') || bodyPart.includes('run') || bodyPart.includes('bike') || bodyPart.includes('row')) musclesInSession.add('Cardio');
+
+                // Map bodyPart keywords to high-level muscle groups using keyword lists.
+                const MUSCLE_KEYWORDS = {
+                    Chest: ['chest', 'pectoral', 'pec'],
+                    Back: ['back', 'lats', 'latissimus', 'trap', 'trapezius'],
+                    Shoulders: ['shoulder', 'deltoid', 'delts'],
+                    Arms: ['arm', 'biceps', 'triceps', 'forearm', 'upper arm', 'lower arm'],
+                    Legs: ['upper leg', 'lower leg', 'quad', 'quads', 'hamstring', 'calf', 'thigh'],
+                    Waist: ['waist', 'core', 'abs', 'abdominal', 'ab'],
+                    Glutes: ['glute', 'butt', 'gluteus'],
+                    Neck: ['neck'],
+                    Cardio: ['cardio', 'run', 'bike', 'row', 'treadmill', 'elliptical']
+                };
+
+                for (const [muscle, keywords] of Object.entries(MUSCLE_KEYWORDS)) {
+                    for (const kw of keywords) {
+                        if (bodyPart.includes(kw)) {
+                            musclesInSession.add(muscle);
+                            break; // stop checking other keywords for this muscle
+                        }
+                    }
+                }
             });
         }
         musclesInSession.forEach(m => { if (counts[m] !== undefined) counts[m] += 1; });
