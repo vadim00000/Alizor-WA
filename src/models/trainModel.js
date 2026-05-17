@@ -14,6 +14,7 @@ export const trainModel = {
 
   sessions: [],
   activeSession: null,
+  selectedHomeSessionId: null,
 
   loadTemplatesPromiseState: {},
   saveTemplatePromiseState: {},
@@ -38,6 +39,11 @@ export const trainModel = {
 
   setSessions(loaded) {
     this.sessions = loaded;
+  },
+
+  toggleSelectedHomeSessionId(sessionId) {
+    this.selectedHomeSessionId =
+      this.selectedHomeSessionId === sessionId ? null : sessionId;
   },
 
   selectTemplate(id) {

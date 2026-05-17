@@ -1,9 +1,19 @@
 
 
 import { useNavigate } from "react-router-dom";
+import HomeSessionView from "./homeSessionView";
 
 export default function HomeView(props) {
   const navigate = useNavigate();
+
+  if (props.selectedSession) {
+    return (
+      <HomeSessionView
+        session={props.selectedSession}
+        onClose={props.onCloseSelectedSession}
+      />
+    );
+  }
 
   return (
     <div className="home-container">
@@ -29,11 +39,23 @@ export default function HomeView(props) {
 
         {props.showHistory && (
           <ul className="home-list">
-            {props.recentSessions.length === 0 ? (
+              {props.recentSessions.length === 0 ? (
               <p className="home-empty">No sessions in the last 7 days.</p>
             ) : (
               props.recentSessions.map((session, i) => (
-                <li key={session.id}>
+                <li
+                  key={session.id}
+                  className="home-list-item"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => props.onSelectSession(session.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      props.onSelectSession(session.id);
+                    }
+                  }}
+                >
                   <span className="home-list-index">{String(i + 1)}</span>
                   <span className="home-list-name">{session.templateName}</span>
                   <span className="home-list-date">
@@ -41,6 +63,7 @@ export default function HomeView(props) {
                       day: "numeric", month: "short"
                     })}
                   </span>
+
                 </li>
               ))
             )}
