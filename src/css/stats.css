@@ -1,0 +1,71 @@
+/* Styles for the Stats view, using global CSS variables from index.css */
+.stats-container {
+  padding: 32px 40px;
+  color: var(--text-h);
+  font-family: var(--sans);
+}
+
+.stats-container h1 {
+  margin: 0 0 8px 0;
+  font-family: var(--heading);
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.stats-actions {
+  display: flex;
+  gap: 10px;
+  margin: 16px 0 20px 0;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+
+.tab-btn.active {
+  /* use green -> teal palette like other charts */
+  background: linear-gradient(90deg, #C6FF00 0%, #00FFB2 100%);
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 255, 178, 0.08);
+}
+
+.action-panel {
+  background: #0f0f10;
+  border: 1px solid rgba(255,255,255,0.03);
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.pr-ex-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.04);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.pr-ex-btn.active,
+.pr-ex-btn:hover {
+  background: linear-gradient(90deg, rgba(198,255,0,0.12), rgba(0,255,178,0.06));
+  border-color: rgba(0,255,178,0.18);
+  color: var(--text-h);
+}
+
+.chart-wrapper {
+  margin-top: 12px;
+}
+
+.stats-empty {
+  color: #9aa0a6;
+}
