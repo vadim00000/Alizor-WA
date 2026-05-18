@@ -10,91 +10,105 @@ The application is built using React with MobX for state management and integrat
 
 ## Implemented Features
 
-The following functionalities have been implemented:
+High-level features:
 
-* Fetch and display available body parts from the ExerciseDB API
-* Fetch and display exercises for a selected body part
-* Create multiple workouts with custom names
-* Select a workout and add exercises to it
-* Remove exercises from a workout
-* Manage sets for each exercise (add/remove sets, edit weight and repetitions)
-* Delete a selected workout
-* Persist workouts using Firebase Firestore (per user)
-* Handle asynchronous operations using a structured promise state pattern
-
----
-
-## Planned Improvements
-
-The following features are planned but not yet implemented:
-
-* Improve the user interface (layout, styling, and responsiveness)
-* Add search and filtering for exercises
-* Enable renaming of workouts
-* Add statistics and records features
-* Enhance the home page
+- Exercise browsing and discovery
+- Create and manage workout templates
+- Record and persist sessions per user
+- Profile and weight history tracking
+- Statistics and records with charts (weight history, PRs, muscle summaries)
+- Authentication and per-user persistence
 
 ---
 
 ## Project Structure
 
-```txt
+```
+index.html
+package.json
+vite.config.js
+public/
 src/
+  index.css
+  resolvePromise.js
 
-  apiConfig.js          # Configuration for API requests (headers, base URL)
-  App.css               # Global application styles
-  exercise.js           # Exercise data structure / helpers
-  exerciseSource.js     # API calls to fetch exercises and body parts
-  index.css             # Base styling
-  resolvePromise.js     # Utility to manage async promise states
-  utilities.js          # General helper functions
-  workout.js            # Workout and exercise creation logic
+  firebase/
+    config.js
 
-  firebase/             # Firebase configuration and authentication
-    auth.js             # Authentication logic
-    config.js           # Firebase initialization
+  models/
+    authModel.js
+    sessionModel.js
+    profileModel.js
+    trainModel.js
+    statsModel.js
+    firestoreModel.js
+    mobxReactiveModel.js
 
-  models/               # Application state and business logic (MobX)
-    authModel.js        # Authentication state management
-    firestoreModel.js   # Firestore interaction logic
-    profileModel.js     # User profile state
-    sessionModel.js     # Session handling (user state)
-    trainModel.js       # Workout and training logic
+  reactjs/
+    App.jsx
+    main.jsx
+    homePresenter.jsx
+    navBarPresenter.jsx
+    profilePresenter.jsx
+    statsPresenter.jsx
+    trainPresenter.jsx
+    authPresenter.jsx
 
-  presenters/           # Connect models with views (logic + interaction)
-    profilePresenter.jsx# Handles profile interactions
+  views/
+    homeView.jsx
+    navBarView.jsx
+    profileView.jsx
+    statsView.jsx
+    trainView.jsx
+    recordsView.jsx
+    weightChart.jsx
 
-  reactjs/              # Main React presenters and app orchestration
-    App.jsx             # Root React component
-    main.jsx            # Application entry point
-    authPresenter.jsx   # Authentication flow
-    homePresenter.jsx   # Home page logic
-    navBarPresenter.jsx # Navigation bar logic
-    profilePresenter.jsx# Profile logic (duplicate responsibility)
-    recordsPresenter.jsx# Workout records logic
-    statsPresenter.jsx  # Statistics logic
-    trainPresenter.jsx  # Training/workout logic
+  css/
+    index.css
+    navBar.css
+    profile.css
+    stats.css
+    train.css
+    home.css
 
-  views/                # Pure UI components (rendering only)
-    authView.jsx        # Authentication UI
-    bodyPartsView.jsx   # Displays body parts list
-    exercisesView.jsx   # Displays exercises list
-    homeView.jsx        # Home page UI
-    navBarView.jsx      # Navigation bar UI
-    profileView.jsx     # Profile UI
-    recordsView.jsx     # Records UI
-    statsView.jsx       # Statistics UI
-    suspenseView.jsx    # Loading/error handling UI
-    workoutsView.jsx    # List of workouts UI
-    workoutView.jsx     # Single workout UI (sets, reps, etc.)
 ```
 
 ---
 
-## Notes
+## How to run 
+1) Prerequisites
 
-* API keys are managed using environment variables and are not included in the repository
-* Each developer must provide their own API key when running the project locally
-* Firebase is used for persistent storage of workouts
+- Node.js (>=16 recommended) and npm installed
+- A Firebase project configured (Firestore) and credentials set in `src/firebase/config.js` or environment variables used by that file
+
+2) Install dependencies
+
+```bash
+# from project root
+npm install
+```
+
+If you plan to use the charts (recommended for Stats), install these packages as well:
+
+```bash
+# install Chart.js, react wrapper and date adapter
+npm install chart.js react-chartjs-2 chartjs-adapter-date-fns --save
+```
+
+3) Local development server
+
+```bash
+# start dev server (Vite)
+npm run dev
+```
+
+Open http://localhost:5173 (or the URL indicated by Vite) in your browser.
+
+
+## Notes & Development hints
+
+- UI state for the Stats views is intentionally stored in `statsModel` to avoid using `useState` in the view layer.
+- Persistence and promise state: `resolvePromise` helpers are used across models to surface load/save status to the UI. Check `resolvePromise.js` to understand the pattern.
+- Charts use `chartjs-adapter-date-fns` for time-based axes; the weight chart uses a fixed Y-domain to keep scales consistent.
 
 ---
