@@ -16,13 +16,11 @@ import 'chartjs-adapter-date-fns';
 ChartJS.register(LineElement, PointElement, LinearScale, TimeScale, Title, Tooltip, Legend, Filler);
 
 export default function WeightChart({ points, height = 220 }) {
-  // points: [{ x: Date, y: number }]
   const data = {
     datasets: [
       {
         label: 'Weight (kg)',
         data: points.map(p => ({ x: p.x, y: p.y })),
-        // use a green->teal gradient used elsewhere in the app
         borderColor: function(context) {
           const chart = context.chart;
           const {ctx, chartArea} = chart;
@@ -58,7 +56,6 @@ export default function WeightChart({ points, height = 220 }) {
       x: {
         type: 'time',
         time: {
-          // show minute-level granularity when available
           unit: 'minute',
           tooltipFormat: 'PPpp',
         },

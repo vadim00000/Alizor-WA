@@ -3,7 +3,6 @@ export const profileModel = {
   sex: null,
   weightKg: null,
   targetWeightKg: null,
-  // array of { ts: number, weightKg: number }
   weightHistory: [],
   currentUserId: null,
 

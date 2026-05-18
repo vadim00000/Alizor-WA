@@ -1,7 +1,7 @@
 import { login, signup } from "../firebase/auth";
 
 export const authModel = {
-  mode: "login", // "login" or "signup"
+  mode: "login",
   emailInput: "",
   passwordInput: "",
   usernameInput: "",
@@ -59,7 +59,7 @@ export const authModel = {
       return;
     }
     if (!this.passwordInput || this.passwordInput.length < 6) {
-      this.error = "The password must be at least 6 characters long"; // Firebase requirement for password
+      this.error = "The password must be at least 6 characters long"; 
       return;
     }
     if (this.mode === "signup" && !this.usernameInput.trim()) {

@@ -8,12 +8,6 @@ import { auth } from "../firebase/config";
 let trainPersistenceConnected = false;
 let profilePersistenceConnected = false;
 
-/**
- * Connect train model to Firestore lifecycle using MobX reactions.
- * Loads templates and sessions on auth change, persists template
- * saves/deletes and session saves whenever the model exposes a new
- * intent (templateToSave, templateToDeleteId, sessionToSave).
- */
 export function connectToPersistence(model, sessionModel, watchFunction = reaction) {
   if (trainPersistenceConnected) return;
   trainPersistenceConnected = true;

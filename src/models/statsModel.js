@@ -178,12 +178,9 @@ function buildExerciseSeries(sessions = []) {
 
   return exerciseSeries;
 }
-
-// Simple MobX model for stats. Presenter will read derived data from here;
-// persistence is handled in src/models/firestoreModel.js via a watch function.
 export const statsModel = {
   currentUserId: null,
-  sessions: [], // array of { date, muscles, volume, duration, calories }
+  sessions: [], 
   monthlyData: [],
   totalVolume: 0,
   comparison: 0,
@@ -211,7 +208,6 @@ export const statsModel = {
     this.uiSelectedExerciseSeries = Array.isArray(series) ? series : [];
   },
 
-  // called by presenter to add a session
   addSession(session) {
     this.sessions = [...this.sessions, session];
     this.totalSessions = this.sessions.length;
@@ -281,8 +277,6 @@ export const statsModel = {
       exerciseSeries,
     };
   },
-
-  // persistence for stats is handled by src/models/firestoreModel.js
 };
 
 export default statsModel;
