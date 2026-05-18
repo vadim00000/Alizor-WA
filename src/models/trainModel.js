@@ -25,6 +25,8 @@ export const trainModel = {
   templateToDeleteId: null,
   sessionToSave: null,
 
+  showHistory: false,
+
   currentUserId: null,
 
   setTemplates(loaded) {
@@ -232,4 +234,8 @@ export const trainModel = {
       return Number.isFinite(timestamp) && timestamp >= oneWeekAgo;
     });
   },
+
+  toggleShowHistory() {
+    this.showHistory = !this.showHistory;
+  }
 };
