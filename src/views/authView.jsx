@@ -1,31 +1,41 @@
+
 export function AuthView(props) {
     const isSignup = props.mode === "signup";
 
     function emailChangeACB(evt) {
         props.onEmailChange(evt.target.value);
     }
+
     function passwordChangeACB(evt) {
         props.onPasswordChange(evt.target.value);
     }
+
     function usernameChangeACB(evt) {
         props.onUsernameChange(evt.target.value);
     }
+
     function onSubmitACB(evt) {
         evt.preventDefault();
         props.onSubmit();
     }
+
     function onLoginModeACB() {
         props.onModeChange("login");
     }
+
     function onSignupModeACB() {
         props.onModeChange("signup");
     }
 
     return (
-        <div className="auth-wrapper">
-            <div className="auth-header">
-                <h1 className="auth-logo">ALIZOR</h1>
-                <p className="auth-tagline">Track your workouts</p>
+        <div className="auth-container">
+            <div className="auth-hero">
+                <h1 className="auth-title">
+                    ALIZOR <span>{isSignup ? "signup." : "login."}</span>
+                </h1>
+                <p className="auth-sub">
+                    Track your workouts, build your program, and stay consistent.
+                </p>
             </div>
 
             <div className="auth-card">
@@ -37,6 +47,7 @@ export function AuthView(props) {
                     >
                         Login
                     </button>
+
                     <button
                         type="button"
                         className={`auth-tab${isSignup ? " active" : ""}`}
@@ -82,14 +93,16 @@ export function AuthView(props) {
                             type="password"
                             value={props.passwordInput || ""}
                             onChange={passwordChangeACB}
-                            placeholder={isSignup ? "At least 6 characters" : "••••••••"} 
+                            placeholder={isSignup ? "At least 6 characters" : "••••••••"}
                             autoComplete={isSignup ? "new-password" : "current-password"}
                             disabled={props.loading}
                         />
                     </div>
 
                     {props.error && (
-                        <p className="auth-error">{props.error}</p>
+                        <div className="auth-alert">
+                            {props.error}
+                        </div>
                     )}
 
                     <button
@@ -99,8 +112,7 @@ export function AuthView(props) {
                     >
                         {props.loading
                             ? "Loading..."
-                            : isSignup ? "Create account" : "Login"
-                        }
+                            : isSignup ? "Create account" : "Login"}
                     </button>
                 </form>
             </div>
