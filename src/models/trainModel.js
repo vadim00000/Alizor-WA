@@ -227,5 +227,18 @@ export const trainModel = {
 
   toggleShowHistory() {
     this.showHistory = !this.showHistory;
-  }
+  },
+
+  getWeeklySessionCount() {
+    if(this.sessions == null) return 0;
+    const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+    const recent = this.sessions.filter((session) => {
+        const timestamp = Number(session.performedAt);
+
+        return Number.isFinite(timestamp) && timestamp >= oneWeekAgo;
+    });
+
+    return recent.length;
+}
 };

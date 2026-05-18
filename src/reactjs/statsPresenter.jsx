@@ -3,7 +3,7 @@ import StatsView from "../views/statsView";
 
 const DEFAULT_MUSCLES = ['Chest','Back','Shoulders','Arms','Legs','Core','Glutes','Waist','Neck','Cardio'];
 
-function computeMuscleCounts(sessions = [], options = { all: false }) {
+function computeMuscleCounts(sessions = [], options = { all: false }) {  
     const now = new Date();
     const sessionsThisMonth = options.all ? sessions : sessions.filter(s => {
         const d = new Date(s.performedAt || s.date || Date.now());
@@ -11,7 +11,6 @@ function computeMuscleCounts(sessions = [], options = { all: false }) {
     });
     const counts = {};
     DEFAULT_MUSCLES.forEach(m => counts[m] = 0);
-    // Sessions may not have 'muscles' precomputed. Derive from exercises' bodyPart when needed.
     sessionsThisMonth.forEach(s => {
         const musclesInSession = new Set();
         if (Array.isArray(s.muscles) && s.muscles.length) {
@@ -20,7 +19,6 @@ function computeMuscleCounts(sessions = [], options = { all: false }) {
             s.exercises.forEach(ex => {
                 const bodyPart = String(ex.bodyPart || '').toLowerCase();
 
-                // Map bodyPart keywords to high-level muscle groups using keyword lists.
                 const MUSCLE_KEYWORDS = {
                     Chest: ['chest', 'pectoral', 'pec'],
                     Back: ['back', 'lats', 'latissimus', 'trap', 'trapezius'],
@@ -37,7 +35,7 @@ function computeMuscleCounts(sessions = [], options = { all: false }) {
                     for (const kw of keywords) {
                         if (bodyPart.includes(kw)) {
                             musclesInSession.add(muscle);
-                            break; // stop checking other keywords for this muscle
+                            break; 
                         }
                     }
                 }
@@ -49,7 +47,6 @@ function computeMuscleCounts(sessions = [], options = { all: false }) {
 }
 
 function buildTemplateStats(templates, sessions) {
-    // normalize templates into an array: accept arrays, iterable objects, or plain objects
     let templateList = [];
     if (Array.isArray(templates)) {
         templateList = templates;
@@ -92,25 +89,19 @@ function buildTemplateStats(templates, sessions) {
 }
 
 const StatsPresenter = observer(function StatsPresenter(props) {
-    // props.trainModel contains templates/sessions (data)
-    // props.statsModel contains UI state and saved stats
     const trainModel = props.trainModel || {};
     const statsModel = props.statsModel || {};
 
-    // compute only with sessions whose template still exists (non-deleted)
     const templates = Array.isArray(trainModel.templates) ? trainModel.templates : [];
     const sessions = Array.isArray(trainModel.sessions) ? trainModel.sessions : [];
     const existingTemplateIds = new Set(templates.map(t => String(t.id)));
 
-    // If templates haven't loaded yet (empty) but sessions exist, don't filter to avoid transient zeros
     let sessionsNonDeleted;
     if (templates.length === 0 && sessions.length > 0) {
         sessionsNonDeleted = sessions;
     } else {
         sessionsNonDeleted = sessions.filter(s => existingTemplateIds.has(String(s.templateId)));
     }
-
-    // (debug logs removed)
 
     const stats = buildTemplateStats(
         templates,
@@ -119,7 +110,6 @@ const StatsPresenter = observer(function StatsPresenter(props) {
 
     const totalSessions = sessionsNonDeleted.length;
 
-    // Button contents computed here in presenter
     const totalVolume = sessionsNonDeleted.reduce((acc, s) => {
         if (typeof s.volume === 'number') return acc + s.volume;
         if (Array.isArray(s.exercises)) {
@@ -139,11 +129,9 @@ const StatsPresenter = observer(function StatsPresenter(props) {
     const overviewText = `Overview: ${totalSessions} sessions, total volume ${totalVolume}`;
     const prsText = `PRs: ${Array.isArray(statsModel.prs) ? statsModel.prs.length : 0} records`;
 
-    // compute muscle counts for the same non-deleted session set
     const muscleCounts = computeMuscleCounts(sessionsNonDeleted);
     const muscleCountsAll = computeMuscleCounts(sessionsNonDeleted, { all: true });
 
-    // Compute PRs: best (weight, then reps) per exercise name across sessions
     const prsMap = new Map();
     sessionsNonDeleted.forEach(s => {
         if (!Array.isArray(s.exercises)) return;
@@ -170,7 +158,6 @@ const StatsPresenter = observer(function StatsPresenter(props) {
     const prs = Array.from(prsMap.values()).sort((a, b) => b.weight - a.weight || b.reps - a.reps);
     const prsTextUpdated = `PRs: ${prs.length} exercises`;
 
-    // build weightPoints from profileModel if provided
     const profileModel = props.profileModel;
     let weightPoints = [];
     try {
@@ -182,8 +169,7 @@ const StatsPresenter = observer(function StatsPresenter(props) {
             }).sort((a,b) => a.x - b.x);
         }
     } catch (e) { weightPoints = []; }
-
-    // build per-exercise series: for each exercise name, collect points [{x:Date,y:weight}]
+   
     const exerciseMap = new Map();
     try {
         sessionsNonDeleted.forEach(s => {

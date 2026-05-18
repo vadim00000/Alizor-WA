@@ -1,9 +1,8 @@
 import { observer } from "mobx-react-lite";
 import HomeView from "../views/homeView";
-import { getWeeklySessionCount } from "../utilities";
 
 export default observer(function HomePresenter(props) {
-    const sessionsCount = getWeeklySessionCount(props.model.sessions);
+    const sessionsCount = props.model.getWeeklySessionCount();
     const recentSessions = props.model.getWeekSessions();
 
     function onSelectSession(sessionId) {

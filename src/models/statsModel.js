@@ -14,11 +14,8 @@ export const statsModel = {
   bestStreak: 0,
   prs: [],
   musclePercentages: {},
-  // promise state holder used by firestore persistence to surface save status
   saveStatsPromiseState: {},
-  // load promise state holder used by firestore persistence to surface load status
   loadStatsPromiseState: {},
-  // UI state (moved here so views don't need useState)
   uiActiveTab: 'overview',
   uiSelectedExercise: null,
   uiSelectedExerciseSeries: [],
@@ -54,7 +51,6 @@ export const statsModel = {
     this.prs = prs;
   },
 
-  // persistence for stats is handled by src/models/firestoreModel.js
 };
 
 export default statsModel;
