@@ -23,7 +23,8 @@ export const trainModel = {
 
   templateToSave: null,
   templateToDeleteId: null,
-  sessionToSave: null,
+
+  setToSaveSession: false,
 
   showHistory: false,
 
@@ -212,18 +213,7 @@ export const trainModel = {
   },
 
   saveActiveSession() {
-    if (!this.activeSession) return;
-
-    this.sessionToSave = {
-      id: this.activeSession.id,
-      templateId: this.activeSession.templateId,
-      templateName: this.activeSession.templateName,
-      performedAt: this.activeSession.performedAt,
-      exercises: this.activeSession.exercises.map((ex) => ({
-        ...ex,
-        sets: ex.sets.map((s) => ({ ...s })),
-      })),
-    };
+    this.setToSaveSession = true;
   },
 
   getWeekSessions() {

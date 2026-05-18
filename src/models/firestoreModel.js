@@ -81,20 +81,33 @@ export function connectToPersistence(model, sessionModel, watchFunction = reacti
   );
 
   watchFunction(
-    () => model.sessionToSave,
-    (session) => {
-      const userId = sessionModel.user?.uid;
-      if (userId && session) {
-        const promise = setDoc(doc(db, "users", userId, "sessions", String(session.id)), session).then(() => {
-          model.sessions = [...model.sessions, session];
-          model.activeSession = null;
-          model.sessionToSave = null;
-          return session;
-        });
-        resolvePromise(promise, model.saveSessionPromiseState);
-      }
+  () => model.setToSaveSession,
+  (shouldSave) => {
+    const userId = sessionModel.user?.uid;
+
+    if (userId && shouldSave && model.activeSession) {
+      const session = {
+        ...model.activeSession,
+        exercises: model.activeSession.exercises.map((ex) => ({
+          ...ex,
+          sets: ex.sets.map((s) => ({ ...s })),
+        })),
+      };
+
+      const promise = setDoc(
+        doc(db, "users", userId, "sessions", String(session.id)),
+        session
+      ).then(() => {
+        model.sessions = [...model.sessions, session];
+        model.activeSession = null;
+        model.setToSaveSession = false;
+        return session;
+      });
+
+      resolvePromise(promise, model.saveSessionPromiseState);
     }
-  );
+  }
+);
 }
 
 export function connectProfilePersistence(model, sessionModel, watchFunction = reaction) {
