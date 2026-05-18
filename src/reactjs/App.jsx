@@ -6,6 +6,7 @@ import "../css/profile.css";
 import "../css/train.css";
 import "../css/session.css";
 import "../css/auth.css";
+import "../css/homeSession.css";
 
 import {NavBar} from "./navBarPresenter.jsx";
 import HomePresenter from "./homePresenter";
