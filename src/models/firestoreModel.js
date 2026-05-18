@@ -129,18 +129,16 @@ export function connectProfilePersistence(model, sessionModel, watchFunction = r
     (shouldSave) => {
       const userId = sessionModel.user?.uid;
       if (userId && shouldSave) {
-
-        // Append/update weight history per-minute: if the last entry has the same
-        // minute (YYYY-MM-DD HH:MM) then replace it, otherwise append a new entry.
-        try {
           const hist = Array.isArray(model.weightHistory) ? model.weightHistory.slice() : [];
           const now = new Date();
           const last = hist.length ? hist[hist.length - 1] : null;
-          const sameMinute = last && (() => {
-            try {
+          const sameMinute = Boolean(last) && (() => {
               const lastDate = new Date(Number(last.ts));
-              return lastDate.getFullYear() === now.getFullYear() && lastDate.getMonth() === now.getMonth() && lastDate.getDate() === now.getDate() && lastDate.getHours() === now.getHours() && lastDate.getMinutes() === now.getMinutes();
-            } catch (e) { return false; }
+              return lastDate.getFullYear() === now.getFullYear() 
+                     && lastDate.getMonth() === now.getMonth() 
+                     && lastDate.getDate() === now.getDate() 
+                     && lastDate.getHours() === now.getHours() 
+                     && lastDate.getMinutes() === now.getMinutes();
           })();
 
           if (model.weightKg != null) {
@@ -170,26 +168,6 @@ export function connectProfilePersistence(model, sessionModel, watchFunction = r
             });
 
           resolvePromise(promise, model.saveProfilePromiseState);
-          return;
-        } catch (e) {
-          // fall back to naive save if anything fails
-          console.warn('weightHistory append failed', e);
-        }
-
-        const profileData = {
-          age: model.age,
-          sex: model.sex,
-          weightKg: model.weightKg,
-          targetWeightKg: model.targetWeightKg,
-        };
-
-        const promise = setDoc(doc(db, "users", userId), profileData, { merge: true })
-          .then(() => {
-            model.setToSave = false;
-            return profileData;
-          });
-
-        resolvePromise(promise, model.saveProfilePromiseState);
       }
     }
   );
@@ -202,10 +180,8 @@ export function connectAuthPersistence(sessionModel) {
 }
 
 export function connectStatsPersistence(statsModel, sessionModel, watchFunction = reaction) {
-  // Keep idempotent
   if (!statsModel || !sessionModel) return;
 
-  // Watch for user changes and load stats for user
   watchFunction(
     () => sessionModel.user?.uid ?? null,
     (userId) => {
@@ -226,7 +202,6 @@ export function connectStatsPersistence(statsModel, sessionModel, watchFunction 
               statsModel.prs = Array.isArray(data.prs) ? data.prs : [];
               statsModel.musclePercentages = data.musclePercentages || {};
             } else {
-              // reset to defaults
               statsModel.sessions = [];
               statsModel.monthlyData = [];
               statsModel.totalVolume = 0;
@@ -248,7 +223,6 @@ export function connectStatsPersistence(statsModel, sessionModel, watchFunction 
     { fireImmediately: true }
   );
 
-  // Watch for changes in statsModel and persist them
   watchFunction(
     () => [statsModel.sessions.length, statsModel.totalVolume, JSON.stringify(statsModel.musclePercentages)],
     () => {
@@ -271,7 +245,6 @@ export function connectStatsPersistence(statsModel, sessionModel, watchFunction 
 
         const promise = setDoc(doc(db, 'users', uid, 'stats', 'summary'), statsData, { merge: true })
           .then(() => {
-            // return the saved payload for consistency with resolvePromise handlers
             return statsData;
           });
 
@@ -281,5 +254,3 @@ export function connectStatsPersistence(statsModel, sessionModel, watchFunction 
     }
   );
 }
-
-// stats persistence is performed inline inside connectStatsPersistence using setDoc
