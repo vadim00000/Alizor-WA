@@ -105,9 +105,35 @@ npm run dev
 Open http://localhost:5173 (or the URL indicated by Vite) in your browser.
 
 
-## Notes & Development hints
-
-- Persistence and promise state: `resolvePromise` helpers are used across models to surface load/save status to the UI. Check `resolvePromise.js` to understand the pattern.
-- Charts use `chartjs-adapter-date-fns` for time-based axes; the weight chart uses a fixed Y-domain to keep scales consistent.
-
 ---
+
+## Third-Party Components
+
+This project uses several third-party libraries and external services:
+
+### Frameworks & Libraries
+- React → UI framework
+- React Router DOM → client-side routing
+- MobX + mobx-react-lite → state management and reactivity
+- Firebase → authentication and Firestore database persistence
+- Vite → development server and build tool
+
+### Charts
+- chart.js
+- react-chartjs-2
+- chartjs-adapter-date-fns
+
+These libraries are used for the statistics and weight history visualizations.
+
+### External APIs
+- ExerciseDB API (RapidAPI)
+  - Used to fetch body parts and exercise information.
+  - Implemented in:
+    - `apiConfig.js`
+    - `exerciseSource.js`
+
+### User-visible third-party components
+- Exercise animations/GIFs returned by ExerciseDB API
+- Loading GIF used in:
+  - `views/suspenseView.jsx`
+
