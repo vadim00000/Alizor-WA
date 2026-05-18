@@ -29,20 +29,7 @@
   font-size: 56px;
   line-height: 1;
   letter-spacing: 0.03em;
-}
-
-
-
-.stats-hero-badge {
-  background: #161616;
-  border: 1px solid #222;
-  border-radius: 16px;
-  padding: 14px 18px;
-  color: #C6FF00;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.16);
+  color: #F0F0F0;
 }
 
 .stats-summary-grid {
@@ -170,6 +157,7 @@
   font-size: 30px;
   line-height: 1;
   letter-spacing: 0.03em;
+  color: #FFFFFF;
 }
 
 .stats-section-subtitle {

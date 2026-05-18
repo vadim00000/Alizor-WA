@@ -233,15 +233,10 @@ export const statsModel = {
   getViewData(trainModel, profileModel) {
     const templates = normalizeModelList(trainModel?.templates);
     const sessions = normalizeModelList(trainModel?.sessions);
-    const existingTemplateIds = new Set(templates.map((template) => String(template.id)));
 
-    const sessionsNonDeleted = templates.length === 0 && sessions.length > 0
-      ? sessions
-      : sessions.filter((session) => existingTemplateIds.has(String(session.templateId)));
-
-    const stats = buildTemplateStats(templates, sessionsNonDeleted);
-    const totalSessions = sessionsNonDeleted.length;
-    const totalVolume = sessionsNonDeleted.reduce((total, session) => {
+    const stats = buildTemplateStats(templates, sessions);
+    const totalSessions = sessions.length;
+    const totalVolume = sessions.reduce((total, session) => {
       if (typeof session.volume === 'number') return total + session.volume;
 
       if (!Array.isArray(session.exercises)) return total;
@@ -259,9 +254,9 @@ export const statsModel = {
       return total + sessionVolume;
     }, 0);
 
-    const exerciseSeries = buildExerciseSeries(sessionsNonDeleted);
-    const { prs, prsByExercise } = buildPrGroups(sessionsNonDeleted);
-    const muscleCounts = computeMuscleCounts(sessionsNonDeleted);
+    const exerciseSeries = buildExerciseSeries(sessions);
+    const { prs, prsByExercise } = buildPrGroups(sessions);
+    const muscleCounts = computeMuscleCounts(sessions);
     const muscleEntries = Object.entries(muscleCounts)
       .filter(([, value]) => Number(value) > 0)
       .sort((a, b) => b[1] - a[1]);

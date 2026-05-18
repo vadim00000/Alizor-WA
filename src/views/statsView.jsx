@@ -41,9 +41,6 @@ export default function StatsView(props) {
                     <p className="stats-kicker">Training analytics</p>
                     <h1 className="stats-title">Stats</h1>
                 </div>
-                <div className="stats-hero-badge">
-                    Total sessions logged: {props.totalSessions}
-                </div>
             </div>
 
             <div className="stats-summary-grid">
