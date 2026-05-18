@@ -57,6 +57,4 @@ export const statsModel = {
   // persistence for stats is handled by src/models/firestoreModel.js
 };
 
-makeAutoObservable(statsModel);
-
 export default statsModel;
