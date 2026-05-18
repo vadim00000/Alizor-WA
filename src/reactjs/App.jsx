@@ -10,7 +10,6 @@ import "../css/auth.css";
 import {NavBar} from "./navBarPresenter.jsx";
 import HomePresenter from "./homePresenter";
 import { StatsPresenter } from "./statsPresenter.jsx";
-import RecordsView from "../views/recordsView";
 import { AuthPresenter } from "./authPresenter";
 import { ProfilePresenter } from "./profilePresenter";
 import { Train } from "./trainPresenter.jsx";
@@ -44,7 +43,6 @@ const App = observer(function App() {
         <Route path="/" element={<HomePresenter model={reactiveTrainModel}/>}/>
   <Route path="/stats" element={<StatsPresenter trainModel={reactiveTrainModel} statsModel={reactiveStatsModel} profileModel={reactiveProfileModel} />} />
         <Route path="/train" element={<Train model={reactiveTrainModel} />} />
-        <Route path="/records" element={<RecordsView />} />
         <Route path="/profile" element={<ProfilePresenter model={reactiveProfileModel} />} />
       </Routes>
     </BrowserRouter>

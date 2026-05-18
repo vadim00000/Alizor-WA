@@ -11,7 +11,6 @@ const NavBar = observer(
         { path: "/",        label: "Home"},
         { path: "/stats",   label: "Stats"},
         { path: "/train",   label: "Train"},
-        { path: "/records", label: "Records"},
         { path: "/profile", label: "Profile"}
         ];
 
