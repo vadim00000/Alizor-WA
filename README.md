@@ -107,7 +107,6 @@ Open http://localhost:5173 (or the URL indicated by Vite) in your browser.
 
 ## Notes & Development hints
 
-- UI state for the Stats views is intentionally stored in `statsModel` to avoid using `useState` in the view layer.
 - Persistence and promise state: `resolvePromise` helpers are used across models to surface load/save status to the UI. Check `resolvePromise.js` to understand the pattern.
 - Charts use `chartjs-adapter-date-fns` for time-based axes; the weight chart uses a fixed Y-domain to keep scales consistent.
 
