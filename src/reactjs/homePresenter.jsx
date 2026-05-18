@@ -8,12 +8,25 @@ export default observer(function HomePresenter(props) {
     const [isOpen, setIsOpen] = useState(false);
     const recentSessions = props.model.getWeekSessions();
 
+    function onSelectSession(sessionId) {
+        props.model.toggleSelectedHomeSessionId(sessionId);
+    }
+
+    const selectedSession = recentSessions.find(
+        (session) => session.id === props.model.selectedHomeSessionId
+    );
+
     return (
         <HomeView
             sessionsCount={sessionsCount}
             recentSessions={recentSessions}
             showHistory={isOpen}
             onToggleHistory={() => setIsOpen(!isOpen)}
+            onSelectSession={onSelectSession}
+            selectedSession={selectedSession}
+            onCloseSelectedSession={() =>
+                selectedSession && props.model.toggleSelectedHomeSessionId(selectedSession.id)
+            }
         />
     );
 });

@@ -1,22 +1,15 @@
 export function TemplatesView(props) {
     return (
         <div>
-            <h3>My session templates</h3>
-
             {props.templates.length === 0 ? (
-                <p>No template yet. Create one above.</p>
+                <p className="templates-empty">No workout yet. Create one above.</p>
             ) : (
-                <ul>
+                <ul className="templates-list">
                     {props.templates.map((t) => (
                         <li key={t.id}>
                             <button
+                                className={t.id === props.selectedTemplateId ? "selected" : ""}
                                 type="button"
-                                style={{
-                                    fontWeight:
-                                        t.id === props.selectedTemplateId
-                                            ? "bold"
-                                            : "normal",
-                                }}
                                 onClick={() => props.onSelectTemplate(t.id)}
                             >
                                 {t.name} ({t.exercises.length} exos)

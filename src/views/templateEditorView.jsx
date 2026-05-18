@@ -3,26 +3,30 @@ export function TemplateEditorView(props) {
 
     if (!template) {
         return (
-            <div>
-                <h3>No template selected</h3>
-                <p>Select an existing template or create a new one.</p>
+            <div className="train-card">
+                <div className="editor-header">
+                    <h3>No template selected</h3>
+                </div>
+                <p className="editor-empty">Select an existing template or create a new one.</p>
             </div>
         );
     }
 
     return (
-        <div>
-            <h3>Editing: {template.name}</h3>
+        <div className="train-card">
+            <div className="editor-header">
+                <h3>{template.name}</h3>
+            </div>
 
             {template.exercises.length === 0 ? (
-                <p>No exercise yet. Pick one from the body parts search.</p>
+                <p className="editor-empty">No exercise yet. Pick one from the body parts search.</p>
             ) : (
-                <ul>
+                <ul className="editor-exercises-list">
                     {template.exercises.map((ex) => (
                         <li key={ex.id}>
-                            <div>{ex.name}</div>
-                            <label>
-                                Sets:{" "}
+                            <div className="exercise-editor-name">{ex.name}</div>
+                            <div className="exercise-editor-sets">
+                                <label>Sets:</label>
                                 <input
                                     type="number"
                                     min={1}
@@ -34,9 +38,10 @@ export function TemplateEditorView(props) {
                                         )
                                     }
                                 />
-                            </label>
+                            </div>
                             <button
                                 type="button"
+                                className="exercise-editor-remove"
                                 onClick={() => props.onRemoveExercise(ex)}
                             >
                                 Remove
@@ -46,9 +51,10 @@ export function TemplateEditorView(props) {
                 </ul>
             )}
 
-            <div>
+            <div className="editor-actions">
                 <button
                     type="button"
+                    className="editor-button"
                     onClick={props.onSaveTemplate}
                     disabled={props.saveInProgress}
                 >
@@ -57,22 +63,27 @@ export function TemplateEditorView(props) {
 
                 <button
                     type="button"
+                    className="editor-button"
                     onClick={props.onStartSession}
                     disabled={template.exercises.length === 0}
                 >
                     Start session
                 </button>
 
-                <button type="button" onClick={props.onRemoveTemplate}>
+                <button
+                    type="button"
+                    className="editor-button delete"
+                    onClick={props.onRemoveTemplate}
+                >
                     Delete template
                 </button>
             </div>
 
             {props.saveError && (
-                <p>
+                <div className="editor-error">
                     Could not save template:{" "}
                     {props.saveError?.message ?? String(props.saveError)}
-                </p>
+                </div>
             )}
         </div>
     );

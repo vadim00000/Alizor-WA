@@ -2,21 +2,24 @@ export function SessionLogView(props) {
     const session = props.session;
 
     return (
-        <div>
-            <h2>Logging session: {session.templateName}</h2>
-            <p>Started at {new Date(session.performedAt).toLocaleString()}</p>
+        <div className="train-card">
+            <div className="session-header">
+                <h2>{session.templateName}</h2>
+                <p className="session-timestamp">Started at {new Date(session.performedAt).toLocaleString()}</p>
+            </div>
 
-            <ul>
+            <ul className="session-exercises-list">
                 {session.exercises.map((ex) => (
                     <li key={ex.id}>
-                        <div>{ex.name}</div>
-                        <ul>
+                        <div className="session-exercise-name">{ex.name}</div>
+                        <ul className="session-sets-list">
                             {ex.sets.map((s, i) => (
                                 <li key={i}>
-                                    <span>Set {i + 1}</span>
+                                    <span className="set-label">Set {i + 1}</span>
                                     <input
                                         type="number"
                                         placeholder="kg"
+                                        className="set-input"
                                         value={s.weight ?? ""}
                                         onChange={(e) =>
                                             props.onUpdateSet(ex.id, i, {
@@ -24,10 +27,11 @@ export function SessionLogView(props) {
                                             })
                                         }
                                     />
-                                    <span>kg</span>
+                                    <span className="set-unit">kg</span>
                                     <input
                                         type="number"
                                         min={1}
+                                        className="set-input"
                                         value={s.reps}
                                         onChange={(e) =>
                                             props.onUpdateSet(ex.id, i, {
@@ -35,7 +39,7 @@ export function SessionLogView(props) {
                                             })
                                         }
                                     />
-                                    <span>reps</span>
+                                    <span className="set-unit">reps</span>
                                 </li>
                             ))}
                         </ul>
@@ -43,25 +47,30 @@ export function SessionLogView(props) {
                 ))}
             </ul>
 
-            <div>
+            <div className="session-actions">
                 <button
                     type="button"
+                    className="session-button"
                     onClick={props.onSaveSession}
                     disabled={props.saveInProgress}
                 >
                     {props.saveInProgress ? "Saving..." : "Save session"}
                 </button>
 
-                <button type="button" onClick={props.onCancelSession}>
+                <button
+                    type="button"
+                    className="session-button cancel"
+                    onClick={props.onCancelSession}
+                >
                     Cancel
                 </button>
             </div>
 
             {props.saveError && (
-                <p>
+                <div className="session-error">
                     Could not save session:{" "}
                     {props.saveError?.message ?? String(props.saveError)}
-                </p>
+                </div>
             )}
         </div>
     );

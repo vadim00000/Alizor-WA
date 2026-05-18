@@ -1,6 +1,10 @@
 import { observer } from "mobx-react-lite";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import "../App.css";
+import "../css/navBar.css";
+import "../css/home.css";
+import "../css/profile.css";
+import "../css/train.css";
+import "../css/session.css";
 
 import {NavBar} from "./navBarPresenter.jsx";
 import HomePresenter from "./homePresenter";
