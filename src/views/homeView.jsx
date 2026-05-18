@@ -36,36 +36,46 @@ export default function HomeView(props) {
 
 
         {props.showHistory && (
-          <ul className="home-list">
-              {props.recentSessions.length === 0 ? (
+          <div className="home-history-box">
+            <div className="home-history-box-head">
+              <div>
+                <p className="home-history-box-title">Recent sessions</p>
+                <p className="home-history-box-subtitle">Scroll to see all workouts</p>
+              </div>
+            </div>
+
+            {props.recentSessions.length === 0 ? (
               <p className="home-empty">No sessions in the last 7 days.</p>
             ) : (
-              props.recentSessions.map((session, i) => (
-                <li
-                  key={session.id}
-                  className="home-list-item"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => props.onSelectSession(session.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      props.onSelectSession(session.id);
-                    }
-                  }}
-                >
-                  <span className="home-list-index">{String(i + 1)}</span>
-                  <span className="home-list-name">{session.templateName}</span>
-                  <span className="home-list-date">
-                    {new Date(session.performedAt).toLocaleDateString("fr-FR", {
-                      day: "numeric", month: "short"
-                    })}
-                  </span>
-
-                </li>
-              ))
+              <div className="home-history-scroll">
+                <ul className="home-list">
+                  {props.recentSessions.map((session, i) => (
+                    <li
+                      key={session.id}
+                      className="home-list-item"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => props.onSelectSession(session.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          props.onSelectSession(session.id);
+                        }
+                      }}
+                    >
+                      <span className="home-list-index">{String(i + 1)}</span>
+                      <span className="home-list-name">{session.templateName}</span>
+                      <span className="home-list-date">
+                        {new Date(session.performedAt).toLocaleDateString("en-EN", {
+                          day: "numeric", month: "short"
+                        })}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
-          </ul>
+          </div>
         )}
       </div>
 

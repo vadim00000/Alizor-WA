@@ -1,0 +1,154 @@
+.home-session-top {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.home-session-section-head {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 0 4px;
+}
+
+.home-session-kicker {
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: #C6FF00;
+	margin-bottom: 6px;
+}
+
+.home-session-title {
+	font-family: 'Bebas Neue', sans-serif;
+	font-size: 30px;
+	line-height: 1;
+	color: #F0F0F0;
+	letter-spacing: 0.04em;
+}
+
+.home-toggle-inline {
+	width: auto;
+	margin-bottom: 0;
+	white-space: nowrap;
+}
+
+.home-session-exercises {
+	margin-top: 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.home-ex-scroll {
+	max-height: min(58vh, 620px);
+	overflow-y: auto;
+	padding-right: 4px;
+}
+
+.home-ex-list {
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	margin: 0;
+	padding: 0;
+}
+
+.home-ex-item {
+	background: linear-gradient(180deg, rgba(22, 22, 22, 0.98), rgba(20, 20, 20, 0.98));
+	border: 1px solid #222;
+	border-radius: 22px 22px 22px 8px;
+	padding: 18px 18px 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	box-shadow: 0 14px 32px rgba(0, 0, 0, 0.2);
+	position: relative;
+	overflow: hidden;
+}
+
+.home-ex-item::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	height: 2px;
+	background: linear-gradient(90deg, #C6FF00, #00FFB2);
+}
+
+.home-ex-item-head {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.home-ex-name {
+	font-size: 14px;
+	color: #F0F0F0;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+}
+
+.home-ex-subtitle {
+	font-size: 12px;
+	color: rgba(240, 240, 240, 0.55);
+	margin-top: 4px;
+}
+
+.home-ex-badge {
+	font-size: 12px;
+	font-weight: 600;
+	color: #C6FF00;
+	background: rgba(198, 255, 0, 0.08);
+	border: 1px solid rgba(198, 255, 0, 0.2);
+	border-radius: 999px;
+	padding: 6px 10px;
+	white-space: nowrap;
+}
+
+.home-ex-sets {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding-top: 2px;
+	border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.home-ex-set-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	background: rgba(255, 255, 255, 0.02);
+	border: 1px solid rgba(255, 255, 255, 0.05);
+	border-radius: 14px;
+	padding: 10px 12px;
+	font-size: 12px;
+	color: #F0F0F0;
+}
+
+.home-ex-set-index {
+	font-weight: 600;
+	color: rgba(240, 240, 240, 0.75);
+	white-space: nowrap;
+}
+
+.home-ex-set-value {
+	color: #C6FF00;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.home-ex-item:hover {
+	border-color: rgba(198, 255, 0, 0.3);
+	transform: translateY(-1px);
+	transition: border-color 0.2s, transform 0.2s;
+}

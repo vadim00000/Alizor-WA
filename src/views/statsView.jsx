@@ -1,166 +1,204 @@
 import WeightChart from './WeightChart';
 import '../css/stats.css';
 
+function StatCard({ label, value, unit }) {
+    return (
+        <article className="stats-summary-card">
+            <p className="stats-summary-label">{label}</p>
+            <p className="stats-summary-number">{value}</p>
+            {unit ? <p className="stats-summary-unit">{unit}</p> : null}
+        </article>
+    );
+}
+
+function SectionTitle({ kicker, title, subtitle }) {
+    return (
+        <div className="stats-section-head">
+            <div>
+                {kicker ? <p className="stats-kicker">{kicker}</p> : null}
+                <h2 className="stats-section-title">{title}</h2>
+            </div>
+            {subtitle ? <p className="stats-section-subtitle">{subtitle}</p> : null}
+        </div>
+    );
+}
+
 export default function StatsView(props) {
-    // Fully prop-driven: component reads values from props (with sensible defaults)
-    // and invokes callbacks to request changes. No internal useState is used here.
     const active = props.activeTab ?? 'overview';
+    const summaryCards = Array.isArray(props.summaryCards) ? props.summaryCards : [];
+    const stats = Array.isArray(props.stats) ? props.stats : [];
+    const muscleEntries = Array.isArray(props.muscleEntries) ? props.muscleEntries : [];
+    const exerciseNames = Array.isArray(props.exerciseNames) ? props.exerciseNames : [];
+    const prExerciseNames = Array.isArray(props.prExerciseNames) ? props.prExerciseNames : [];
     const selectedExercise = props.selectedExercise ?? null;
-    const selectedExerciseSeries = props.selectedExerciseSeries ?? [];
-
-    const setActive = (v) => { if (typeof props.onActiveTabChange === 'function') props.onActiveTabChange(v); };
-    const setSelectedExercise = (v) => { if (typeof props.onSelectedExerciseChange === 'function') props.onSelectedExerciseChange(v); };
-    const setSelectedExerciseSeries = (v) => { if (typeof props.onSelectedExerciseSeriesChange === 'function') props.onSelectedExerciseSeriesChange(v); };
-
-    const renderOverview = () => {
-        const stats = props.stats || [];
-        return (
-            <div>
-                <p>{props.overviewText}</p>
-                <ul>
-                    {stats.map(s => (
-                        <li key={String(s.templateId)}>{s.templateName || 'Unknown'}{!s.exists ? ' (deleted)' : ''}: {s.count} {s.count === 1 ? 'session' : 'sessions'}</li>
-                    ))}
-                </ul>
-
-                {Array.isArray(props.weightPoints) && props.weightPoints.length > 0 && (
-                    <div style={{ marginTop: '1rem' }}>
-                        <h3 style={{ margin: '0 0 0.25rem 0' }}>Weight history</h3>
-                        <WeightChart points={props.weightPoints} height={260} />
-                    </div>
-                )}
-            </div>
-        );
-    };
-
-    const renderMuscles = () => {
-        const mc = props.muscleCounts || {};
-        const entries = Object.entries(mc)
-            .filter(([, v]) => Number(v) > 0)
-            .sort((a, b) => b[1] - a[1]);
-        return (
-            <ul>
-                {entries.map(([k, v]) => <li key={k}>{k}: {v}</li>)}
-                {entries.length === 0 && <li>No muscles worked</li>}
-            </ul>
-        );
-    };
-
-    const renderPRs = () => {
-        const prs = props.prs || [];
-        if (!prs.length) return <p>{props.prsText || 'No PRs yet'}</p>;
-
-        // Group PRs by exercise name (if prs is an array of { name, weight, reps })
-        const byExercise = prs.reduce((acc, p) => {
-            const key = p.name || 'Unknown';
-            acc[key] = acc[key] || [];
-            acc[key].push(p);
-            return acc;
-        }, {});
-
-        const exercises = Object.keys(byExercise).sort();
-
-        return (
-            <div>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
-                    {exercises.map((ex) => (
-                        <button key={ex} onClick={() => setSelectedExercise(ex)} className={`pr-ex-btn ${selectedExercise === ex ? 'active' : ''}`}>
-                            {ex}
-                        </button>
-                    ))}
-                    {exercises.length === 0 && <span>No PR exercises</span>}
-                </div>
-
-                {selectedExercise ? (
-                    <div>
-                        <h4 style={{ margin: '0 0 0.5rem 0' }}>{selectedExercise} — PRs</h4>
-                        <ul>
-                            {byExercise[selectedExercise].map((p, i) => (
-                                <li key={i}>{p.name}: {p.weight} x {p.reps}</li>
-                            ))}
-                        </ul>
-                        <button onClick={() => setSelectedExercise(null)} style={{ marginTop: '0.5rem' }}>Back</button>
-                    </div>
-                ) : (
-                    <p style={{ color: '#666' }}>Clique sur un exercice pour voir ses PRs</p>
-                )}
-            </div>
-        );
-    };
+    const selectedExerciseSeries = Array.isArray(props.selectedExerciseSeries) ? props.selectedExerciseSeries : [];
+    const selectedPrs = Array.isArray(props.selectedPrs) ? props.selectedPrs : [];
 
     return (
         <div className="stats-container">
-            <h1>Stats</h1>
-            <p style={{ marginTop: 8 }}>Total sessions logged: {props.totalSessions}</p>
-
-            <div className="stats-actions">
-                <button className={`tab-btn overview ${active === 'overview' ? 'active' : ''}`} onClick={() => setActive('overview')}>Overview</button>
-                <button className={`tab-btn details ${active === 'details' ? 'active' : ''}`} onClick={() => {
-                    setActive('details');
-                    // auto-select first exercise if available
-                    const exKeys = Object.keys(props.exerciseSeries || {});
-                    if (exKeys.length > 0) {
-                        setSelectedExercise(exKeys[0]);
-                        setSelectedExerciseSeries(props.exerciseSeries[exKeys[0]] || []);
-                    } else {
-                        setSelectedExercise(null);
-                        setSelectedExerciseSeries([]);
-                    }
-                }}>Details</button>
-                <button className={`tab-btn muscles ${active === 'muscles' ? 'active' : ''}`} onClick={() => setActive('muscles')}>Muscles</button>
-                <button className={`tab-btn prs ${active === 'prs' ? 'active' : ''}`} onClick={() => setActive('prs')}>PRs</button>
+            <div className="stats-hero">
+                <div>
+                    <p className="stats-kicker">Training analytics</p>
+                    <h1 className="stats-title">Stats</h1>
+                </div>
+                <div className="stats-hero-badge">
+                    Total sessions logged: {props.totalSessions}
+                </div>
             </div>
 
-            <div className="action-panel">
-                {active === 'overview' && renderOverview()}
-                {active === 'details' && (
-                    <div>
-                        <h3 style={{ marginTop: 0 }}>Exercise Details</h3>
-                        {renderDetailsForExercises(props.exerciseSeries, (ex) => {
-                            setSelectedExercise(ex);
-                            setSelectedExerciseSeries(props.exerciseSeries[ex] || []);
-                        }, setSelectedExerciseSeries)}
+            <div className="stats-summary-grid">
+                {summaryCards.map((card) => (
+                    <StatCard
+                        key={card.label}
+                        label={card.label}
+                        value={card.value}
+                        unit={card.unit}
+                    />
+                ))}
+            </div>
 
-                        {selectedExercise && (
-                            <div style={{ marginTop: '1rem' }}>
-                                <h4 style={{ margin: '0 0 0.5rem 0' }}>{selectedExercise}</h4>
-                                {Array.isArray(selectedExerciseSeries) && selectedExerciseSeries.length > 0 ? (
-                                    <div className="chart-wrapper"><WeightChart points={selectedExerciseSeries} height={260} /></div>
+            <div className="stats-tabs">
+                <button className={`tab-btn ${active === 'overview' ? 'active' : ''}`} onClick={() => props.onActiveTabChange('overview')}>Overview</button>
+                <button className={`tab-btn ${active === 'details' ? 'active' : ''}`} onClick={() => props.onActiveTabChange('details')}>Details</button>
+                <button className={`tab-btn ${active === 'muscles' ? 'active' : ''}`} onClick={() => props.onActiveTabChange('muscles')}>Muscles</button>
+                <button className={`tab-btn ${active === 'prs' ? 'active' : ''}`} onClick={() => props.onActiveTabChange('prs')}>PRs</button>
+            </div>
+
+            <section className="stats-panel">
+                {active === 'overview' && (
+                    <div className="stats-stack">
+                        <SectionTitle kicker="Overview" title="Workout distribution" subtitle={props.overviewText} />
+
+                        <div className="stats-card stats-card-tight">
+                            <ul className="stats-session-list">
+                                {stats.length === 0 ? (
+                                    <li className="stats-empty">No sessions available yet.</li>
                                 ) : (
-                                    <p className="stats-empty">No data for this exercise yet.</p>
+                                    stats.map((sessionStat) => (
+                                        <li key={String(sessionStat.templateId)} className="stats-session-row">
+                                            <span className="stats-session-name">
+                                                {sessionStat.templateName || 'Unknown'}
+                                                {!sessionStat.exists ? ' (deleted)' : ''}
+                                            </span>
+                                            <span className="stats-session-count">
+                                                {sessionStat.count} {sessionStat.count === 1 ? 'session' : 'sessions'}
+                                            </span>
+                                        </li>
+                                    ))
                                 )}
-                                <div style={{ marginTop: '0.5rem' }}>
-                                    <button onClick={() => { setSelectedExercise(null); setSelectedExerciseSeries([]); }}>Back</button>
-                                </div>
+                            </ul>
+                        </div>
+
+                        {Array.isArray(props.weightPoints) && props.weightPoints.length > 0 && (
+                            <div className="stats-chart-card">
+                                <SectionTitle kicker="Progress" title="Weight history" subtitle="Body weight trend over time." />
+                                <WeightChart points={props.weightPoints} height={260} />
                             </div>
                         )}
                     </div>
                 )}
-                {active === 'muscles' && renderMuscles()}
-                {active === 'prs' && renderPRs()}
-            </div>
+
+                {active === 'details' && (
+                    <div className="stats-stack">
+                        <SectionTitle kicker="Details" title="Exercise progression" subtitle="Pick an exercise to view its heaviest set over time." />
+
+                        <div className="stats-chip-row">
+                            {exerciseNames.length === 0 ? (
+                                <p className="stats-empty">No exercise data available.</p>
+                            ) : (
+                                exerciseNames.map((exerciseName) => (
+                                    <button
+                                        key={exerciseName}
+                                        type="button"
+                                        className={`stats-chip ${selectedExercise === exerciseName ? 'active' : ''}`}
+                                        onClick={() => props.onSelectedExerciseChange(exerciseName)}
+                                    >
+                                        {exerciseName}
+                                    </button>
+                                ))
+                            )}
+                        </div>
+
+                        <div className="stats-card">
+                            {selectedExercise ? (
+                                selectedExerciseSeries.length > 0 ? (
+                                    <div className="stats-chart-card-inner">
+                                        <h3 className="stats-card-title">{selectedExercise}</h3>
+                                        <WeightChart points={selectedExerciseSeries} height={260} />
+                                    </div>
+                                ) : (
+                                    <p className="stats-empty">No data for this exercise yet.</p>
+                                )
+                            ) : (
+                                <p className="stats-empty">Select an exercise to display its progression.</p>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {active === 'muscles' && (
+                    <div className="stats-stack">
+                        <SectionTitle kicker="Muscles" title="Monthly muscle balance" subtitle="High-level groups derived from your training sessions." />
+
+                        {muscleEntries.length === 0 ? (
+                            <div className="stats-card">
+                                <p className="stats-empty">No muscles worked yet.</p>
+                            </div>
+                        ) : (
+                            <div className="stats-chip-grid">
+                                {muscleEntries.map(([muscle, count]) => (
+                                    <article key={muscle} className="stats-chip-card">
+                                        <span className="stats-chip-name">{muscle}</span>
+                                        <span className="stats-chip-count">{count}</span>
+                                    </article>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {active === 'prs' && (
+                    <div className="stats-stack">
+                        <SectionTitle kicker="PRs" title="Personal records" subtitle={props.prsText || 'No PRs yet.'} />
+
+                        <div className="stats-chip-row">
+                            {prExerciseNames.length === 0 ? (
+                                <p className="stats-empty">No PR exercises available.</p>
+                            ) : (
+                                prExerciseNames.map((exerciseName) => (
+                                    <button
+                                        key={exerciseName}
+                                        type="button"
+                                        className={`stats-chip ${selectedExercise === exerciseName ? 'active' : ''}`}
+                                        onClick={() => props.onSelectedExerciseChange(exerciseName)}
+                                    >
+                                        {exerciseName}
+                                    </button>
+                                ))
+                            )}
+                        </div>
+
+                        <div className="stats-card">
+                            {selectedExercise ? (
+                                selectedPrs.length > 0 ? (
+                                    <ul className="stats-pr-list">
+                                        {selectedPrs.map((pr, index) => (
+                                            <li key={`${pr.name}-${index}`} className="stats-pr-row">
+                                                <span className="stats-pr-main">{pr.name}</span>
+                                                <span className="stats-pr-value">{pr.weight} kg × {pr.reps} reps</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="stats-empty">No PR data for this exercise yet.</p>
+                                )
+                            ) : (
+                                <p className="stats-empty">Select an exercise to see its PRs.</p>
+                            )}
+                        </div>
+                    </div>
+                )}
+            </section>
         </div>
     );
 }
-
-function renderDetailsForExercises(exerciseSeries, setSelectedExercise, setSelectedExerciseSeries) {
-    const exercises = Object.keys(exerciseSeries || {}).sort();
-    if (exercises.length === 0) return <p>No exercise data available</p>;
-
-    return (
-        <div>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
-                {exercises.map(ex => (
-                    <button key={ex} onClick={() => { setSelectedExercise(ex); setSelectedExerciseSeries(exerciseSeries[ex] || []); }} className="pr-ex-btn">
-                        {ex}
-                    </button>
-                ))}
-            </div>
-            <div>
-                <p style={{ color: '#666' }}>Click on an exercise to see its weight progression over time.</p>
-            </div>
-        </div>
-    );
-}
-
-
